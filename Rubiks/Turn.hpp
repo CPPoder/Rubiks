@@ -3,6 +3,7 @@
 
 
 #include "TurnType.hpp"
+#include "TurnTypeOrder.hpp"
 
 #include <list>
 #include <vector>
@@ -58,9 +59,29 @@ public:
 
 public:
 	static std::string getTurnTypeString(TurnType turnType);
+	static TurnType getTurnTypeFromNumberInArray(unsigned int number, bool useOnlyQuarterTurns);
+	static unsigned int getNumberOfTurnTypes(bool useOnlyQuarterTurns);
+
+public:
+	static TurnType transformTurnTypeViaZ2Rotation(TurnType turnType); //This function is used to transform turns like T-perm onto the flipped cube
+	static TurnTypeOrder transformTurnTypeOrderViaZ2Rotation(TurnTypeOrder const & turnTypeOrder); //Applies Z2Rotation to every turnType
+
+public:
+	static bool isStringConvertibleIntoTurns(std::string const & string, TurnTypeOrder& turns);
+	static bool isStringConvertibleIntoTurnType(std::string const & string, TurnType& turnType);
+	static bool isCharEqualToOneCharInList(char c, std::list<char> listOfChars);
+
+public:
+	static void appendTurnTypeOrder(TurnTypeOrder& t1, TurnTypeOrder const & t2);
 
 };
 
+TurnTypeOrder operator+(TurnTypeOrder const & t1, TurnTypeOrder const & t2);
+TurnTypeOrder& operator+=(TurnTypeOrder & t1, TurnTypeOrder const & t2);
+
+TurnTypeOrder operator+(TurnTypeOrder const & t1, TurnType const & t2);
+TurnTypeOrder operator+(TurnType const & t1, TurnTypeOrder const & t2);
+TurnTypeOrder operator+(TurnType const & t1, TurnType const & t2);
 
 
 #endif //TURN_HPP

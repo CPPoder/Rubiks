@@ -2,6 +2,8 @@
 #define TURNTYPE_HPP
 
 
+#include <iostream>
+
 
 
 enum class TurnType
@@ -26,6 +28,8 @@ enum class TurnType
 	Left2
 };
 
+
+std::ostream& operator<<(std::ostream& oStream, TurnType const & turnType);
 
 TurnType operator!(TurnType turnType);
 

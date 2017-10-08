@@ -4,17 +4,26 @@
 
 #include "Plane.hpp"
 #include "PlanePos.hpp"
-#include "Turn.hpp"
 #include "TurnOrder.hpp"
+#include "TurnTypeOrder.hpp"
+#include "Clock.hpp"
 
 #include <iostream>
 #include <string>
 #include <chrono>
 #include <map>
 
+class Turn;
+
+using Pieces = std::list<std::list<Color>>;
+using StickerPos = std::pair<PlanePos, unsigned int>;
+using PiecePos = std::list<StickerPos>;
 
 class Cube
 {
+public:
+	class InvalidCubeException;
+
 private:
 	Plane mUpPlane;
 	Plane mDownPlane;
@@ -33,93 +42,29 @@ public:
 
 
 public:
-	enum class SolveTurns
-	{
-		ALL,
-		QUARTER_TURNS
-	};
-
-
-public:
-	class Comparator
-	{
-	private:
-		std::function<bool(Cube const &, Cube const &)> compareFunction;
-
-	public:
-		Comparator() = delete;
-		Comparator(std::function<bool(Cube const &, Cube const &)> compFunc);
-		~Comparator() = default;
-		Comparator(Comparator const &) = default;
-		Comparator& operator=(Comparator const &) = default;
-
-	public:
-		bool operator()(Cube const & cube1, Cube const & cube2) const;
-		friend Comparator operator&&(Comparator const & c1, Comparator const & c2);
-
-	public:
-		static const Comparator FullCube;
-		static const Comparator PureWhiteCross;
-		static const Comparator FullWhiteCross;
-		struct FullCorner
-		{
-			static const Comparator UpFrontRight;
-			static const Comparator UpFrontLeft;
-			static const Comparator UpBackRight;
-			static const Comparator UpBackLeft;
-			static const Comparator DownFrontRight;
-			static const Comparator DownFrontLeft;
-			static const Comparator DownBackRight;
-			static const Comparator DownBackLeft;
-		};
-		struct PureCorner
-		{
-			static const Comparator UpFrontRight;
-			static const Comparator UpFrontLeft;
-			static const Comparator UpBackRight;
-			static const Comparator UpBackLeft;
-			static const Comparator DownFrontRight;
-			static const Comparator DownFrontLeft;
-			static const Comparator DownBackRight;
-			static const Comparator DownBackLeft;
-		};
-		struct Edge
-		{
-			static const Comparator UpFront;
-			static const Comparator UpBack;
-			static const Comparator UpRight;
-			static const Comparator UpLeft;
-			static const Comparator DownFront;
-			static const Comparator DownBack;
-			static const Comparator DownRight;
-			static const Comparator DownLeft;
-			static const Comparator FrontRight;
-			static const Comparator FrontLeft;
-			static const Comparator BackRight;
-			static const Comparator BackLeft;
-		};
-		struct Pair
-		{
-			static const Comparator FrontRight;
-			static const Comparator FrontLeft;
-			static const Comparator BackRight;
-			static const Comparator BackLeft;
-		};
-		static const Comparator YellowCross;
-		static const Comparator YellowPlane;
-	};
-
-
-public:
 	Plane& at(PlanePos planePos);
 	Plane const & at(PlanePos planePos) const;
+
+	Color& at(StickerPos const & stickerPos);
+	Color const & at(StickerPos const & stickerPos) const;
+	Color& at(PlanePos planePos, unsigned int stickerNumber);
+	Color const & at(PlanePos planePos, unsigned int stickerNumber) const;
+
 	void turn(Turn const & turn);
 	void turn(TurnType turnType);
+	void turn(TurnTypeOrder const & turnTypeOrder);
 	void turn(TurnOrder const & turnOrder);
-	void solve(SolveTurns solveTurns, Comparator comparator) const;
-	void askForConsoleInput();
-	bool countColors() const;
 
+	void askForConsoleInput();
+	bool isValid(InvalidCubeException & returnExceptionIfNotValid) const;
+	bool numberOfAllColorsIs8(std::map<Color, unsigned int> & colorNumbers) const;
+	Pieces getAllPieces() const;
+	bool allPiecesValid(Pieces& invalidPieces) const;
+
+
+public:
+	static const std::list<PiecePos> listOfAllPiecePositions;
+	static bool arePiecesEqual(std::list<Color> const & p1, std::list<Color> const & p2);
 
 public:
 	static Color getCorrectColorOfPlane(PlanePos planePos);
@@ -144,6 +89,37 @@ private:
 	void writeUDFBRLTerminalOutput(std::ostream& oStream) const;
 	void writeCubeNetTerminalOutput(std::ostream& oStream) const;
 
+public:
+	struct InvalidCubeException
+	{
+		enum class Reason
+		{
+			NUMBER_PER_COLOR_IS_NOT_8,
+			PIECES_ARE_INVALID,
+			ONE_EDGE_IS_TILTED,
+			ONE_CORNER_IS_ROTATED,
+			TWO_PIECES_ARE_EXCHANGED
+		} reason;
+
+		struct Info
+		{
+			std::map<Color, unsigned int> colorNumbers;
+			Pieces listOfInvalidPieces;
+			bool cornerRotatedClockwise;
+
+			Info() = default;
+			Info(std::map<Color, unsigned int> const & _colorNumbers);
+			Info(Pieces const & _listOfInvalidPieces);
+			Info(bool _cornerRotatedClockwise);
+
+			static const Info NO_INFO;
+		} info;
+
+		InvalidCubeException() = default;
+		InvalidCubeException(Reason const & _reason, Info const & _info = Info::NO_INFO);
+
+		std::string report() const;
+	};
 
 };
 

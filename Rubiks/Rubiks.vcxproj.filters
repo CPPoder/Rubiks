@@ -13,57 +13,111 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Quelldateien\Parser">
+      <UniqueIdentifier>{0d7528d0-aa1f-4900-8afc-2eee719673fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Core">
+      <UniqueIdentifier>{5921a229-26a5-40be-8c9a-9ddc127facf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Core">
+      <UniqueIdentifier>{55a3f15e-1b2b-4605-a643-314bc8af84f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Parser">
+      <UniqueIdentifier>{8b333cd1-7db3-4728-bf94-61ac845f2dd4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Rubiks.cpp">
-      <Filter>Quelldateien</Filter>
+    <ClCompile Include="Parser.cpp">
+      <Filter>Quelldateien\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="Cube.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Plane.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Turn.cpp">
-      <Filter>Quelldateien</Filter>
+    <ClCompile Include="Clock.cpp">
+      <Filter>Quelldateien\Core</Filter>
     </ClCompile>
     <ClCompile Include="Color.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Quelldateien\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Quelldateien\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Quelldateien\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Rubiks.cpp">
+      <Filter>Quelldateien\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Turn.cpp">
+      <Filter>Quelldateien\Core</Filter>
     </ClCompile>
     <ClCompile Include="TurnOrder.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Quelldateien\Core</Filter>
     </ClCompile>
     <ClCompile Include="TurnType.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Quelldateien\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Token.cpp">
+      <Filter>Quelldateien\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.cpp">
+      <Filter>Quelldateien\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework.cpp">
+      <Filter>Quelldateien\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="TurnTypeOrder.cpp">
+      <Filter>Quelldateien\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Solver.cpp">
+      <Filter>Quelldateien\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cube.hpp">
-      <Filter>Headerdateien</Filter>
+    <ClInclude Include="Parser.hpp">
+      <Filter>Headerdateien\Parser</Filter>
     </ClInclude>
-    <ClInclude Include="Plane.hpp">
-      <Filter>Headerdateien</Filter>
+    <ClInclude Include="Clock.hpp">
+      <Filter>Headerdateien\Core</Filter>
     </ClInclude>
     <ClInclude Include="Color.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="PlanePos.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Turn.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="TurnType.hpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Core</Filter>
     </ClInclude>
     <ClInclude Include="colorOutput.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.hpp">
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.hpp">
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PlanePos.hpp">
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Turn.hpp">
+      <Filter>Headerdateien\Core</Filter>
     </ClInclude>
     <ClInclude Include="TurnOrder.hpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TurnType.hpp">
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Token.hpp">
+      <Filter>Headerdateien\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.hpp">
+      <Filter>Headerdateien\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework.hpp">
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TurnTypeOrder.hpp">
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Solver.hpp">
+      <Filter>Headerdateien\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

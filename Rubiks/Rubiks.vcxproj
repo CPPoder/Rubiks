@@ -89,6 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,23 +143,37 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Clock.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="Framework.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Rubiks.cpp" />
+    <ClCompile Include="Solver.cpp" />
+    <ClCompile Include="Token.cpp" />
     <ClCompile Include="Turn.cpp" />
     <ClCompile Include="TurnOrder.cpp" />
     <ClCompile Include="TurnType.cpp" />
+    <ClCompile Include="TurnTypeOrder.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Clock.hpp" />
     <ClInclude Include="Color.hpp" />
     <ClInclude Include="colorOutput.h" />
+    <ClInclude Include="Command.hpp" />
     <ClInclude Include="Cube.hpp" />
+    <ClInclude Include="Framework.hpp" />
+    <ClInclude Include="Parser.hpp" />
     <ClInclude Include="Plane.hpp" />
     <ClInclude Include="PlanePos.hpp" />
+    <ClInclude Include="Solver.hpp" />
+    <ClInclude Include="Token.hpp" />
     <ClInclude Include="Turn.hpp" />
     <ClInclude Include="TurnOrder.hpp" />
     <ClInclude Include="TurnType.hpp" />
+    <ClInclude Include="TurnTypeOrder.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

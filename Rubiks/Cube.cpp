@@ -1,4 +1,6 @@
 #include "Cube.hpp"
+#include "Turn.hpp"
+#include "Solver.hpp"
 
 
 
@@ -68,6 +70,28 @@ Plane const & Cube::at(PlanePos planePos) const
 }
 
 
+Color& Cube::at(StickerPos const & stickerPos)
+{
+	return this->at(stickerPos.first).at(stickerPos.second);
+}
+
+Color const & Cube::at(StickerPos const & stickerPos) const
+{
+	return this->at(stickerPos.first).at(stickerPos.second);
+}
+
+Color& Cube::at(PlanePos planePos, unsigned int stickerNumber)
+{
+	return this->at(planePos).at(stickerNumber);
+}
+
+Color const & Cube::at(PlanePos planePos, unsigned int stickerNumber) const
+{
+	return this->at(planePos).at(stickerNumber);
+}
+
+
+
 void Cube::turn(Turn const & turn)
 {
 	turn.mTurnFunction(*this);
@@ -79,6 +103,14 @@ void Cube::turn(TurnType turnType)
 	this->turn(Turn::getTurn(turnType));
 }
 
+void Cube::turn(TurnTypeOrder const & turnTypeOrder)
+{
+	for (auto const & turn : turnTypeOrder)
+	{
+		this->turn(turn);
+	}
+}
+
 void Cube::turn(TurnOrder const & turnOrder)
 {
 	for (auto turn : turnOrder.mTurns)
@@ -88,89 +120,7 @@ void Cube::turn(TurnOrder const & turnOrder)
 }
 
 
-void Cube::solve(SolveTurns solveTurns, Cube::Comparator comparator) const
-{
-	bool useOnlyQuarterTurns;
-	switch (solveTurns)
-	{
-	case SolveTurns::ALL:
-		useOnlyQuarterTurns = false;
-		break;
-	case SolveTurns::QUARTER_TURNS:
-		useOnlyQuarterTurns = true;
-		break;
-	}
-
-	std::function<void(std::vector<unsigned int>&, unsigned int)> createNextVectorOfTurnNumbers = [](std::vector<unsigned int>& vecOfTurnNumbers, unsigned int numberOfTurns)
-	{
-		if (vecOfTurnNumbers.empty())
-		{
-			vecOfTurnNumbers = std::vector<unsigned int>({ 0u });
-			std::cout << "Check 1 Turn..." << std::endl;
-			return;
-		}
-		vecOfTurnNumbers.at(0) += 1;
-		unsigned int actualNumber = 0u;
-		while (true)
-		{
-			if (vecOfTurnNumbers.at(actualNumber) == numberOfTurns)
-			{
-				//Increase next Turn Number and check if vec is great enough
-				vecOfTurnNumbers.at(actualNumber) = 0u;
-				actualNumber += 1;
-				if (actualNumber < vecOfTurnNumbers.size())
-				{
-					vecOfTurnNumbers.at(actualNumber) += 1;
-				}
-				else
-				{
-					vecOfTurnNumbers = std::vector<unsigned int>(vecOfTurnNumbers.size() + 1, 0u);
-					vecOfTurnNumbers.back() = 0u;
-					std::cout << "Check " << vecOfTurnNumbers.size() << " Turns..." << std::endl;
-				}
-			}
-			else
-			{
-				break;
-			}
-		}
-	};
-
-	std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
-	Cube const solvedCube;
-	Cube newCube(*this);
-	if (comparator(newCube, solvedCube))
-	{
-		std::cout << "Cube is already solved!" << std::endl;
-	}
-	unsigned int const size = (useOnlyQuarterTurns ? Turn::arrayOfQuarterTurnTypes.size() : Turn::arrayOfAllTurnTypes.size());
-	std::vector<unsigned int> vectorOfTurnNumbers;
-	while (true)
-	{
-		createNextVectorOfTurnNumbers(vectorOfTurnNumbers, size);
-		for (std::vector<unsigned int>::reverse_iterator it = vectorOfTurnNumbers.rbegin(); it != vectorOfTurnNumbers.rend(); ++it)
-		{
-			TurnType turnType = (useOnlyQuarterTurns ? Turn::arrayOfQuarterTurnTypes.at(*it) : Turn::arrayOfAllTurnTypes.at(*it));
-			newCube.turn(turnType);
-		}
-		if (comparator(newCube, solvedCube))
-		{
-			std::cout << "Solved! Turns: ";
-			for (std::vector<unsigned int>::reverse_iterator it = vectorOfTurnNumbers.rbegin(); it != vectorOfTurnNumbers.rend(); ++it)
-			{
-				TurnType turnType = (useOnlyQuarterTurns ? Turn::arrayOfQuarterTurnTypes.at(*it) : Turn::arrayOfAllTurnTypes.at(*it));
-				std::cout << Turn::getTurnTypeString(turnType);
-			}
-			std::chrono::steady_clock::time_point solvedTime = std::chrono::steady_clock::now();
-			std::cout << " (Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(solvedTime - startTime).count() << " ms)";
-			std::cout << std::endl;
-		}
-		newCube = *this;
-	}
-}
-
-
-bool Cube::countColors() const
+bool Cube::numberOfAllColorsIs8(std::map<Color, unsigned int> & colorNumbers) const
 {
 	std::map<Color, unsigned int> colorCounts
 	{
@@ -182,7 +132,7 @@ bool Cube::countColors() const
 		std::make_pair(Color::GREEN, 0u)
 	};
 
-	std::function<void(std::map<Color, unsigned int>&, Plane const &)> planeCountingFunction = [](std::map<Color, unsigned int>& colorCounts, Plane const & plane)
+	std::function<void(Plane const &)> planeCountingFunction = [&colorCounts](Plane const & plane)
 	{
 		for (unsigned int i = 0; i < 8; ++i)
 		{
@@ -190,26 +140,35 @@ bool Cube::countColors() const
 		}
 	};
 
-	planeCountingFunction(colorCounts, this->mUpPlane);
-	planeCountingFunction(colorCounts, this->mDownPlane);
-	planeCountingFunction(colorCounts, this->mFrontPlane);
-	planeCountingFunction(colorCounts, this->mBackPlane);
-	planeCountingFunction(colorCounts, this->mRightPlane);
-	planeCountingFunction(colorCounts, this->mLeftPlane);
-
-	std::cout << "Number of white stickers: " << colorCounts.at(Color::WHITE) << std::endl;
-	std::cout << "Number of yellow stickers: " << colorCounts.at(Color::YELLOW) << std::endl;
-	std::cout << "Number of red stickers: " << colorCounts.at(Color::RED) << std::endl;
-	std::cout << "Number of orange stickers: " << colorCounts.at(Color::ORANGE) << std::endl;
-	std::cout << "Number of blue stickers: " << colorCounts.at(Color::BLUE) << std::endl;
-	std::cout << "Number of green stickers: " << colorCounts.at(Color::GREEN) << std::endl;
+	planeCountingFunction(this->mUpPlane);
+	planeCountingFunction(this->mDownPlane);
+	planeCountingFunction(this->mFrontPlane);
+	planeCountingFunction(this->mBackPlane);
+	planeCountingFunction(this->mRightPlane);
+	planeCountingFunction(this->mLeftPlane);
 
 	bool valid = true;
 	for (auto num : colorCounts)
 	{
 		valid = valid && (num.second == 8u);
 	}
+	colorNumbers = colorCounts;
 	return valid;
+}
+
+
+bool Cube::isValid(InvalidCubeException & returnExceptionIfNotValid) const
+{
+	try
+	{
+		Solver::quicksolve(*this);
+	}
+	catch (Cube::InvalidCubeException exception)
+	{
+		returnExceptionIfNotValid = exception;
+		return false;
+	}
+	return true;
 }
 
 
@@ -358,16 +317,25 @@ void Cube::writeCubeNetTerminalOutput(std::ostream& oStream) const
 
 void Cube::askForConsoleInput()
 {
+	class QuitInputException{};
+
 	std::function<Plane(std::string const &)> planeLoadingFunction = [](std::string const & planeName) -> Plane
 	{
-		std::function<std::array<Color, 3>()> colorRowLodingFunction = []()->std::array<Color, 3>
+		std::function<std::array<Color, 3>()> colorRowLodingFunction = []() -> std::array<Color, 3>
 		{
 			std::array<Color, 3> array;
 			std::string line;
 			std::getline(std::cin, line);
 			if (line.size() != 3)
 			{
-				throw "Type in 3 chars!";
+				if (line == "quit")
+				{
+					throw QuitInputException();
+				}
+				else
+				{
+					throw "Type in 3 chars!";
+				}
 			}
 			for (unsigned int i = 0; i < 3; ++i)
 			{
@@ -412,275 +380,233 @@ void Cube::askForConsoleInput()
 			planeLoadingFunction("Right:"),
 			planeLoadingFunction("Left:")
 		};
-		*this = Cube(planeArray);
-		if (!this->countColors())
+		Cube inputCube(planeArray);
+		InvalidCubeException invalidCubeException;
+		if (!inputCube.isValid(invalidCubeException))
 		{
-			throw "Invalid numbers of colors!";
+			throw invalidCubeException;
 		}
+		*this = inputCube;
 	}
 	catch (char* message)
 	{
 		std::cout << message << std::endl;
-		std::cout << "Cube input canceled!" << std::endl;
+		std::cout << "Try again!" << std::endl;
 		this->askForConsoleInput();
 	}
-}
-
-
-
-
-
-
-
-
-
-Cube::Comparator::Comparator(std::function<bool(Cube const &, Cube const &)> compFunc)
-	: compareFunction(compFunc)
-{
-}
-
-
-bool Cube::Comparator::operator()(Cube const & cube1, Cube const & cube2) const
-{
-	return this->compareFunction(cube1, cube2);
-}
-
-
-Cube::Comparator operator&&(Cube::Comparator const & c1, Cube::Comparator const & c2)
-{
-	return [c1, c2](Cube const & cube1, Cube const & cube2) -> bool
+	catch (QuitInputException)
 	{
-		return (c1(cube1, cube2) && c2(cube1, cube2));
-	};
-}
-
-
-
-
-
-
-
-
-
-
-
-
-const Cube::Comparator Cube::Comparator::FullCube = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
-{
-	return (c1 == c2);
-}
-);
-
-
-const Cube::Comparator Cube::Comparator::PureWhiteCross = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
-{
-	Plane const & upPlane1 = c1.at(PlanePos::UP);
-	Plane const & upPlane2 = c2.at(PlanePos::UP);
-	for (unsigned int i = 1; i < 8; i += 2)
+		std::cout << "Cube input canceled!" << std::endl;
+		return;
+	}
+	catch (InvalidCubeException invalidCubeException)
 	{
-		if (upPlane1.at(i) != upPlane2.at(i))
+		std::cout << "Cube input was invalid!" << std::endl;
+		std::cout << invalidCubeException.report();
+		std::cout << "Cube input canceled!" << std::endl;
+		return;
+	}
+}
+
+
+
+
+Pieces Cube::getAllPieces() const
+{
+	Pieces pieces;
+	for (auto const & piecePos : Cube::listOfAllPiecePositions)
+	{
+		std::list<Color> piece;
+		for (auto const & stickerPos : piecePos)
 		{
-			return false;
+			piece.push_back(this->at(stickerPos));
 		}
+		pieces.push_back(piece);
 	}
-	return true;
+	return std::move(pieces);
 }
-);
 
 
-const Cube::Comparator Cube::Comparator::FullWhiteCross = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
+bool Cube::allPiecesValid(Pieces& invalidPieces) const
 {
-	Plane const & upPlane1 = c1.at(PlanePos::UP);
-	Plane const & upPlane2 = c2.at(PlanePos::UP);
-	for (unsigned int i = 1; i < 8; i += 2)
+	Pieces correctPieces = Cube().getAllPieces();
+	Pieces thisPieces = this->getAllPieces();
+
+	Pieces invalidPiecesCollector;
+
+	for (auto const & piece : thisPieces)
 	{
-		if (upPlane1.at(i) != upPlane2.at(i))
+		bool partnerFound = false;
+		for (auto const & correctPiece : correctPieces)
 		{
-			return false;
+			if (Cube::arePiecesEqual(piece, correctPiece))
+			{
+				partnerFound = true;
+				break;
+			}
 		}
+		if (partnerFound)
+		{
+			continue;
+		}
+		invalidPiecesCollector.push_back(piece);
 	}
-	if (c1.at(PlanePos::FRONT).at(1) != c2.at(PlanePos::FRONT).at(1))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::RIGHT).at(1) != c2.at(PlanePos::RIGHT).at(1))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::LEFT).at(1) != c2.at(PlanePos::LEFT).at(1))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::BACK).at(1) != c2.at(PlanePos::BACK).at(1))
-	{
-		return false;
-	}
-	return true;
+
+	invalidPieces = invalidPiecesCollector;
+	return invalidPiecesCollector.empty();
 }
-);
 
 
 
-const Cube::Comparator Cube::Comparator::FullCorner::UpFrontRight = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
+
+const std::list<PiecePos> Cube::listOfAllPiecePositions = {
+	//Corners
+	{ StickerPos(PlanePos::UP, 0u), StickerPos(PlanePos::LEFT, 0u) , StickerPos(PlanePos::BACK, 2u) },
+	{ StickerPos(PlanePos::UP, 2u), StickerPos(PlanePos::BACK, 0u) , StickerPos(PlanePos::RIGHT, 2u) },
+	{ StickerPos(PlanePos::UP, 4u), StickerPos(PlanePos::RIGHT, 0u) , StickerPos(PlanePos::FRONT, 2u) },
+	{ StickerPos(PlanePos::UP, 6u), StickerPos(PlanePos::FRONT, 0u) , StickerPos(PlanePos::LEFT, 2u) },
+	{ StickerPos(PlanePos::DOWN, 0u), StickerPos(PlanePos::LEFT, 4u) , StickerPos(PlanePos::FRONT, 6u) },
+	{ StickerPos(PlanePos::DOWN, 2u), StickerPos(PlanePos::FRONT, 4u) , StickerPos(PlanePos::RIGHT, 6u) },
+	{ StickerPos(PlanePos::DOWN, 4u), StickerPos(PlanePos::RIGHT, 4u) , StickerPos(PlanePos::BACK, 6u) },
+	{ StickerPos(PlanePos::DOWN, 6u), StickerPos(PlanePos::BACK, 4u) , StickerPos(PlanePos::LEFT, 6u) },
+
+	//Edges
+	{ StickerPos(PlanePos::UP, 1u), StickerPos(PlanePos::BACK, 1u) },
+	{ StickerPos(PlanePos::UP, 3u), StickerPos(PlanePos::RIGHT, 1u) },
+	{ StickerPos(PlanePos::UP, 5u), StickerPos(PlanePos::FRONT, 1u) },
+	{ StickerPos(PlanePos::UP, 7u), StickerPos(PlanePos::LEFT, 1u) },
+	{ StickerPos(PlanePos::FRONT, 3u), StickerPos(PlanePos::RIGHT, 7u) },
+	{ StickerPos(PlanePos::RIGHT, 3u), StickerPos(PlanePos::BACK, 7u) },
+	{ StickerPos(PlanePos::BACK, 3u), StickerPos(PlanePos::LEFT, 7u) },
+	{ StickerPos(PlanePos::LEFT, 3u), StickerPos(PlanePos::FRONT, 7u) },
+	{ StickerPos(PlanePos::DOWN, 1u), StickerPos(PlanePos::FRONT, 5u) },
+	{ StickerPos(PlanePos::DOWN, 3u), StickerPos(PlanePos::RIGHT, 5u) },
+	{ StickerPos(PlanePos::DOWN, 5u), StickerPos(PlanePos::BACK, 5u) },
+	{ StickerPos(PlanePos::DOWN, 7u), StickerPos(PlanePos::LEFT, 5u) }
+};
+
+
+
+
+bool Cube::arePiecesEqual(std::list<Color> const & p1, std::list<Color> const & p2)
 {
-	if (c1.at(PlanePos::FRONT).at(2) != c2.at(PlanePos::FRONT).at(2))
+	if (p1.size() != p2.size())
 	{
 		return false;
 	}
-	if (c1.at(PlanePos::UP).at(4) != c2.at(PlanePos::UP).at(4))
+	unsigned int const size = p1.size();
+
+	if (size == 2u)
 	{
-		return false;
+		bool exactlyEqual = (p1 == p2);
+		std::list<Color> reversedPiece2(p2);
+		reversedPiece2.reverse();
+		bool reversedEqual = (p1 == reversedPiece2);
+		return (exactlyEqual || reversedEqual);
 	}
-	if (c1.at(PlanePos::RIGHT).at(0) != c2.at(PlanePos::RIGHT).at(0))
+
+	if (size == 3u)
 	{
-		return false;
+		std::list<Color>::const_iterator middleIteratorOfP2 = p2.begin();
+		middleIteratorOfP2++;
+		std::list<Color> onceCycledP2 = { *middleIteratorOfP2, p2.back(), p2.front() };
+		std::list<Color> twiceCycledP2 = { p2.back(), p2.front(), *middleIteratorOfP2 };
+		return ((p1 == p2) || (p1 == onceCycledP2) || (p1 == twiceCycledP2));
 	}
-	return true;
+
+	if ((size != 2u) && (size != 3u))
+	{
+		std::cout << "Pieces should contain 2 or 3 stickers! Learn programming!" << std::endl;
+		throw 0;
+	}
 }
-);
 
 
-const Cube::Comparator Cube::Comparator::FullCorner::UpFrontLeft = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
+
+
+
+
+
+
+Cube::InvalidCubeException::Info::Info(std::map<Color, unsigned int> const & _colorNumbers)
+	: colorNumbers(_colorNumbers)
 {
-	if (c1.at(PlanePos::FRONT).at(0) != c2.at(PlanePos::FRONT).at(0))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::UP).at(6) != c2.at(PlanePos::UP).at(6))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::LEFT).at(2) != c2.at(PlanePos::LEFT).at(2))
-	{
-		return false;
-	}
-	return true;
 }
-);
 
-
-const Cube::Comparator Cube::Comparator::FullCorner::UpBackRight = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
+Cube::InvalidCubeException::Info::Info(Pieces const & _listOfInvalidPieces)
+	: listOfInvalidPieces(_listOfInvalidPieces)
 {
-	if (c1.at(PlanePos::BACK).at(0) != c2.at(PlanePos::BACK).at(0))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::UP).at(2) != c2.at(PlanePos::UP).at(2))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::RIGHT).at(2) != c2.at(PlanePos::RIGHT).at(2))
-	{
-		return false;
-	}
-	return true;
 }
-);
 
-//Incorrect!
-const Cube::Comparator Cube::Comparator::FullCorner::UpBackLeft = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
+Cube::InvalidCubeException::Info::Info(bool _cornerRotatedClockwise)
+	: cornerRotatedClockwise(_cornerRotatedClockwise)
 {
-	if (c1.at(PlanePos::FRONT).at(2) != c2.at(PlanePos::FRONT).at(2))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::UP).at(4) != c2.at(PlanePos::UP).at(4))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::RIGHT).at(0) != c2.at(PlanePos::RIGHT).at(0))
-	{
-		return false;
-	}
-	return true;
 }
-);
 
+const Cube::InvalidCubeException::Info Cube::InvalidCubeException::Info::NO_INFO = Cube::InvalidCubeException::Info();
 
-const Cube::Comparator Cube::Comparator::FullCorner::DownFrontRight = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
+Cube::InvalidCubeException::InvalidCubeException(Reason const & _reason, Info const & _info)
+	: reason(_reason), info(_info)
 {
-	if (c1.at(PlanePos::FRONT).at(2) != c2.at(PlanePos::FRONT).at(2))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::UP).at(4) != c2.at(PlanePos::UP).at(4))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::RIGHT).at(0) != c2.at(PlanePos::RIGHT).at(0))
-	{
-		return false;
-	}
-	return true;
 }
-);
 
-
-const Cube::Comparator Cube::Comparator::FullCorner::DownFrontLeft = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
+std::string Cube::InvalidCubeException::report() const
 {
-	if (c1.at(PlanePos::FRONT).at(2) != c2.at(PlanePos::FRONT).at(2))
+	std::stringstream stringStream;
+	stringStream << "Reason for invalidity: ";
+	switch (this->reason)
 	{
-		return false;
-	}
-	if (c1.at(PlanePos::UP).at(4) != c2.at(PlanePos::UP).at(4))
+	case InvalidCubeException::Reason::NUMBER_PER_COLOR_IS_NOT_8:
 	{
-		return false;
+		stringStream << "There are colors that don't occur 8 times!" << std::endl;
+		std::map<Color, unsigned int> colorMap = this->info.colorNumbers;
+		for (auto color : listOfAllColors)
+		{
+			stringStream << mapOfColorNames.at(color) << ": " << colorMap.at(color) << std::endl;
+		}
+		break;
 	}
-	if (c1.at(PlanePos::RIGHT).at(0) != c2.at(PlanePos::RIGHT).at(0))
+	case InvalidCubeException::Reason::PIECES_ARE_INVALID:
 	{
-		return false;
+		stringStream << "There are invalid pieces!" << std::endl;
+		Pieces invalidPieces = this->info.listOfInvalidPieces;
+		for (auto const & piece : invalidPieces)
+		{
+			if (piece.size() == 2)
+			{
+				stringStream << "Edge: ";
+			}
+			else
+			{
+				stringStream << "Corner: ";
+			}
+			for (auto const & color : piece)
+			{
+				stringStream << mapOfColorNames.at(color) << " ";
+			}
+			stringStream << std::endl;
+		}
+		break;
 	}
-	return true;
+	case InvalidCubeException::Reason::ONE_EDGE_IS_TILTED:
+		stringStream << "One edge es tilted!" << std::endl;
+		break;
+	case InvalidCubeException::Reason::ONE_CORNER_IS_ROTATED:
+		stringStream << "One corner is rotated " << ((this->info.cornerRotatedClockwise) ? "clockwise" : "counter clockwise") << "!" << std::endl;
+		break;
+	case InvalidCubeException::Reason::TWO_PIECES_ARE_EXCHANGED:
+		stringStream << "Two pieces are exchanged!" << std::endl;
+		break;
+	}
+
+	return stringStream.str();
 }
-);
 
 
-const Cube::Comparator Cube::Comparator::FullCorner::DownBackRight = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
-{
-	if (c1.at(PlanePos::FRONT).at(2) != c2.at(PlanePos::FRONT).at(2))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::UP).at(4) != c2.at(PlanePos::UP).at(4))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::RIGHT).at(0) != c2.at(PlanePos::RIGHT).at(0))
-	{
-		return false;
-	}
-	return true;
-}
-);
 
 
-const Cube::Comparator Cube::Comparator::FullCorner::DownBackLeft = Cube::Comparator(
-	[](Cube const & c1, Cube const & c2) -> bool
-{
-	if (c1.at(PlanePos::FRONT).at(2) != c2.at(PlanePos::FRONT).at(2))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::UP).at(4) != c2.at(PlanePos::UP).at(4))
-	{
-		return false;
-	}
-	if (c1.at(PlanePos::RIGHT).at(0) != c2.at(PlanePos::RIGHT).at(0))
-	{
-		return false;
-	}
-	return true;
-}
-);
+
+
+
 
 

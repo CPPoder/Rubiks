@@ -1,4 +1,15 @@
 #include "TurnType.hpp"
+#include "Turn.hpp"
+#include <string>
+
+
+std::ostream& operator<<(std::ostream& oStream, TurnType const & turnType)
+{
+	oStream << Turn::getTurnTypeString(turnType);
+	return oStream;
+}
+
+
 
 
 TurnType operator!(TurnType turnType)

@@ -68,3 +68,26 @@ std::ostream& operator<<(std::ostream & oStream, Color color)
 	return oStream;
 }
 
+
+
+
+
+const std::list<Color> listOfAllColors = {
+	Color::WHITE,
+	Color::YELLOW,
+	Color::RED,
+	Color::ORANGE,
+	Color::BLUE,
+	Color::GREEN
+};
+
+
+const std::map<Color, std::string> mapOfColorNames =
+{
+	std::make_pair(Color::WHITE, "White"),
+	std::make_pair(Color::YELLOW, "Yellow"),
+	std::make_pair(Color::RED, "Red"),
+	std::make_pair(Color::ORANGE, "Orange"),
+	std::make_pair(Color::BLUE, "Blue"),
+	std::make_pair(Color::GREEN, "Green")
+};

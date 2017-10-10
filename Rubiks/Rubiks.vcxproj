@@ -165,6 +165,7 @@
     <ClInclude Include="Command.hpp" />
     <ClInclude Include="Cube.hpp" />
     <ClInclude Include="Framework.hpp" />
+    <ClInclude Include="MutexProtectedClass.hpp" />
     <ClInclude Include="Parser.hpp" />
     <ClInclude Include="Plane.hpp" />
     <ClInclude Include="PlanePos.hpp" />

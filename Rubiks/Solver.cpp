@@ -262,6 +262,113 @@ TurnTypeOrder Solver::solveForMultithreading(Cube const & cube, SolveAttributes 
 }
 
 
+TurnTypeOrder Solver::solveOneOfSeveralComparators(Cube const & cube, SolveAttributes solveAttributesWithComparatorBase, std::list<std::pair<Comparator, F2LPairTargetPos>> const & listOfExtraComparatorPairs, std::vector<unsigned int> const & initialVectorOfTurnNumbers, F2LPairTargetPos& solvedPairPosReturn, std::ostream & oStream)
+{
+	//Setup comarator function
+	std::function<bool(Cube const &, Cube const &, F2LPairTargetPos&)> compareFunction =
+		[&solveAttributesWithComparatorBase, &listOfExtraComparatorPairs](Cube const & c1, Cube const & c2, F2LPairTargetPos& returnPairPos) -> bool
+	{
+		if (solveAttributesWithComparatorBase.comparator(c1, c2))
+		{
+			//Check also other comparators
+			for (auto it = listOfExtraComparatorPairs.cbegin(); it != listOfExtraComparatorPairs.cend(); ++it)
+			{
+				if ((it->first)(c1, c2))
+				{
+					returnPairPos = it->second;
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+
+	//Translate SolveTurns into bool
+	bool useOnlyQuarterTurns = (solveAttributesWithComparatorBase.solveTurns == SolveTurns::QUARTER_TURNS);
+
+	//Declare Clocks
+	Clock timeSinceSolveClock;
+	Clock newTurnNumberClock;
+
+	//Declare interrupt variable
+	bool needInterruption = false;
+
+	//Set up cubes
+	Cube const solvedCube;
+	Cube newCube(cube);
+
+	//Handle solved cube case
+	if (compareFunction(newCube, solvedCube, solvedPairPosReturn))
+	{
+		oStream << "Cube is already solved!" << std::endl;
+		return TurnTypeOrder();
+	}
+
+	//Initialize vector of turn Numbers
+	std::vector<unsigned int> vectorOfTurnNumbers(initialVectorOfTurnNumbers);
+
+	//Start Solving
+	while (true)
+	{
+		//Create next vector of turn numbers
+		bool sizeOfVectorOfTurnNumbersHasChanged;
+		std::vector<unsigned int> const oldVectorOfTurnNumbers(vectorOfTurnNumbers);
+		createNextVectorOfTurnNumbersForSolvingSmarter(vectorOfTurnNumbers, useOnlyQuarterTurns, sizeOfVectorOfTurnNumbersHasChanged);
+
+		//If size has changed, output time
+		if (sizeOfVectorOfTurnNumbersHasChanged)
+		{
+			unsigned int const size = vectorOfTurnNumbers.size();
+			oStream << "Time for checking " << size - 1 << ((size - 1 == 1u) ? " turn: " : " turns: ") << newTurnNumberClock.getElapsedTimeAsMilliseconds() << " ms" << std::endl;
+			oStream << std::endl;
+			oStream << "Check " << size << ((size == 1u) ? " turn..." : " turns...") << std::endl;
+			newTurnNumberClock.restart();
+			if (solveAttributesWithComparatorBase.interruptProperties.type == InterruptProperties::Type::AFTER_TURNS)
+			{
+				if (size > solveAttributesWithComparatorBase.interruptProperties.info)
+				{
+					needInterruption = true;
+				}
+			}
+		}
+
+		//Check for interrupt due to time
+		if (solveAttributesWithComparatorBase.interruptProperties.type == InterruptProperties::Type::AFTER_SECONDS)
+		{
+			if (timeSinceSolveClock.getElapsedTimeAsMilliseconds() / 1000 >= solveAttributesWithComparatorBase.interruptProperties.info)
+			{
+				needInterruption = true;
+			}
+		}
+
+		//Check if solve needs to be interrupted
+		if (needInterruption)
+		{
+			throw InterruptException(SolverState(oldVectorOfTurnNumbers, cube, solveAttributesWithComparatorBase));
+		}
+
+		//Execute turns of vectorOfTurnNumbers
+		for (auto const & num : vectorOfTurnNumbers)
+		{
+			TurnType turnType = Turn::getTurnTypeFromNumberInArray(num, useOnlyQuarterTurns);
+			newCube.turn(turnType);
+		}
+
+
+		//Check if cube is solved
+		if (compareFunction(newCube, solvedCube, solvedPairPosReturn))
+		{
+			TurnTypeOrder turnTypeOrder = Solver::trafoVecOfTurnNumInTurnTypeOrder(vectorOfTurnNumbers, useOnlyQuarterTurns);
+			oStream << "Solved! Turns: " << turnTypeOrder << " (Time: " << timeSinceSolveClock.getElapsedTimeAsMilliseconds() << " ms)" << std::endl;
+			return turnTypeOrder;
+		}
+
+		//Reset newCube
+		newCube = cube;
+	}
+}
+
+
 TurnTypeOrder Solver::quicksolve(Cube const & cube)
 {
 	//Copy cube
@@ -299,7 +406,8 @@ TurnTypeOrder Solver::quicksolve(Cube const & cube)
 
 	TurnTypeOrder F2LTurns;
 	//Solver::solveF2L(c, log, F2LTurns);
-	Solver::solveF2LMultithreaded(c, log, F2LTurns);
+	//Solver::solveF2LMultithreaded(c, log, F2LTurns);
+	Solver::solveF2LByCheckingMultiplePairsAtOnce(c, log, F2LTurns);
 	c.turn(F2LTurns);
 	fullTurns += F2LTurns;
 	
@@ -322,7 +430,13 @@ TurnTypeOrder Solver::quicksolve(Cube const & cube)
 bool Solver::solveWhiteCross(Cube const & c, std::ostream & log, TurnTypeOrder& t)
 {
 	std::cout << "Solve white cross...";
-	t = Solver::solve(c, SolveAttributes(SolveTurns::ALL, Comparator::FullWhiteCross, InterruptProperties(InterruptProperties::Type::NEVER)), {}, log);
+
+	Cube cubeCopy(c);
+	TurnTypeOrder pureCrossTurns = Solver::solve(cubeCopy, SolveAttributes(SolveTurns::ALL, Comparator::PureWhiteCross, InterruptProperties(InterruptProperties::Type::NEVER)), {}, log);
+	cubeCopy.turn(pureCrossTurns);
+	TurnTypeOrder fullCrossTurns = Solver::solve(cubeCopy, SolveAttributes(SolveTurns::ALL, Comparator::FullWhiteCross, InterruptProperties(InterruptProperties::Type::NEVER)), {}, log);
+
+	t = pureCrossTurns + fullCrossTurns;
 	std::cout << "Done!" << std::endl;
 	return true;
 }
@@ -533,6 +647,67 @@ bool Solver::solveF2LMultithreaded(Cube const & c, std::ostream & log, TurnTypeO
 			return true;
 		}
 	}
+}
+
+
+bool Solver::solveF2LByCheckingMultiplePairsAtOnce(Cube const & c, std::ostream & log, TurnTypeOrder& t) //This function has put out "Remaining pairs: 4 Remaining pairs: 4 Remaining pairs: 4 ..."! But I can't find the error in this function! So it is probably in the solve function!
+{
+	std::cout << "Solve F2L...";
+
+	std::function<Comparator const & (F2LPairTargetPos const &)> mapPairPosToComparator = [](F2LPairTargetPos const & pairPos) -> Comparator const &
+	{
+		switch (pairPos)
+		{
+		case F2LPairTargetPos::LEFT_BACK:
+			return Comparator::Pair::BackLeft;
+			break;
+		case F2LPairTargetPos::LEFT_FRONT:
+			return Comparator::Pair::FrontLeft;
+			break;
+		case F2LPairTargetPos::RIGHT_BACK:
+			return Comparator::Pair::BackRight;
+			break;
+		case F2LPairTargetPos::RIGHT_FRONT:
+			return Comparator::Pair::FrontRight;
+			break;
+		}
+	};
+
+	Cube cubeCopy(c);
+
+	std::list<F2LPairTargetPos> const listOfAllPairTargetPositions{F2LPairTargetPos::LEFT_BACK, F2LPairTargetPos::LEFT_FRONT, F2LPairTargetPos::RIGHT_BACK, F2LPairTargetPos::RIGHT_FRONT};
+	std::set<F2LPairTargetPos> setOfRemainingPairTargetPositions(listOfAllPairTargetPositions.begin(), listOfAllPairTargetPositions.end());
+	std::set<F2LPairTargetPos> setOfAlreadyUsedPairTargetPositions;
+
+	t = {};
+
+	while (!setOfRemainingPairTargetPositions.empty())
+	{
+		Comparator baseComparator = Comparator::FullWhiteCross;
+		for (auto pairPos : setOfAlreadyUsedPairTargetPositions)
+		{
+			baseComparator = baseComparator && mapPairPosToComparator(pairPos);
+		}
+
+		std::list<std::pair<Comparator, F2LPairTargetPos>> extraComparatorPairs;
+		for (auto pairPos : setOfRemainingPairTargetPositions)
+		{
+			extraComparatorPairs.push_back(std::make_pair(mapPairPosToComparator(pairPos), pairPos));
+		}
+
+		F2LPairTargetPos solvedPairPos;
+		TurnTypeOrder solvingTurns = Solver::solveOneOfSeveralComparators(cubeCopy, SolveAttributes(SolveTurns::ALL, baseComparator, InterruptProperties(InterruptProperties::Type::NEVER)), extraComparatorPairs, {}, solvedPairPos, log);
+		t += solvingTurns;
+		cubeCopy.turn(solvingTurns);
+
+		setOfRemainingPairTargetPositions.erase(solvedPairPos);
+		setOfAlreadyUsedPairTargetPositions.insert(solvedPairPos);
+
+		std::cout << "Remaining pairs: " << setOfRemainingPairTargetPositions.size() << std::endl;
+	}
+
+	std::cout << "Done!" << std::endl;
+	return true;
 }
 
 

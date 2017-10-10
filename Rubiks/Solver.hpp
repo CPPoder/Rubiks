@@ -3,10 +3,11 @@
 
 
 #include "Cube.hpp"
+#include "MutexProtectedClass.hpp"
+
 
 #include <sstream>
-#include <thread>
-#include <mutex>
+#include <set>
 
 
 
@@ -149,35 +150,6 @@ public:
 		LEFT_BACK
 	};
 
-private:
-	template <typename T> class MutexProtectedClass
-	{
-	private:
-		T value;
-		std::mutex mutex;
-
-	public:
-		MutexProtectedClass() : value() {}
-		~MutexProtectedClass() {}
-		MutexProtectedClass(MutexProtectedClass const & x) : value(x.value) {}
-		MutexProtectedClass& operator=(MutexProtectedClass const & x)
-		{
-			mutex.lock();
-			value = x.value;
-			mutex.unlock();
-		}
-		T get() const
-		{
-			return value;
-		}
-		void set(T const & value)
-		{
-			mutex.lock();
-			this->value = value;
-			mutex.unlock();
-		}
-	};
-
 public:
 	Solver() = delete;
 	~Solver() = delete;
@@ -191,6 +163,7 @@ private:
 	static void solveSubManager(Cube const & cube, TurnTypeOrder& turns, SolveAttributes const & solveAttributes, InterruptContinuationInfo const & interruptContinuationInfo);
 	static TurnTypeOrder solve(Cube const & cube, SolveAttributes solveAttributes, std::vector<unsigned int> const & initialVectorOfTurnNumbers, std::ostream & oStream = std::cout);
 	static TurnTypeOrder solveForMultithreading(Cube const & cube, SolveAttributes solveAttributes, std::vector<unsigned int> const & initialVectorOfTurnNumbers, MutexProtectedClass<bool>& solutionFound);
+	static TurnTypeOrder solveOneOfSeveralComparators(Cube const & cube, SolveAttributes solveAttributesWithComparatorBase, std::list<std::pair<Comparator, F2LPairTargetPos>> const & listOfExtraComparatorPairs, std::vector<unsigned int> const & initialVectorOfTurnNumbers,  F2LPairTargetPos& solvedPairPosReturn, std::ostream & oStream = std::cout);
 public:
 	static TurnTypeOrder quicksolve(Cube const & cube);
 	static bool solveWhiteCross(Cube const & c, std::ostream & log, TurnTypeOrder& t);
@@ -198,6 +171,7 @@ public:
 	static bool solveF2LusingPairOrder(Cube const & c, std::ostream & log, TurnTypeOrder& t, std::array<F2LPairTargetPos, 4> const & pairOrder);
 	static void solveF2LusingPairOrderForMultithreading(Cube const & c, TurnTypeOrder& t, std::array<F2LPairTargetPos, 4> const & pairOrder, MutexProtectedClass<bool>& solutionFound, bool& hasThisFunctionFoundTheSolution);
 	static bool solveF2LMultithreaded(Cube const & c, std::ostream & log, TurnTypeOrder& t);
+	static bool solveF2LByCheckingMultiplePairsAtOnce(Cube const & c, std::ostream & log, TurnTypeOrder& t);
 	static bool solveOLL(Cube const & c, std::ostream & log, TurnTypeOrder& t);
 	static bool solvePLL(Cube const & c, std::ostream & log, TurnTypeOrder& t);
 

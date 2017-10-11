@@ -318,7 +318,7 @@ bool Framework::quicksolveCube(std::string const & cube, std::string const & wri
 		{ //Found turns
 			try
 			{
-				mMapOfTurns.at(writeTo) = Solver::quicksolve(*cubePointer);
+				mMapOfTurns.at(writeTo) = Solver::quicksolve(*cubePointer, true);
 				return true;
 			}
 			catch (Cube::InvalidCubeException exception)

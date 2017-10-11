@@ -161,7 +161,7 @@ bool Cube::isValid(InvalidCubeException & returnExceptionIfNotValid) const
 {
 	try
 	{
-		Solver::quicksolve(*this);
+		Solver::quicksolve(*this, false);
 	}
 	catch (Cube::InvalidCubeException exception)
 	{

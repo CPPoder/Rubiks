@@ -66,6 +66,9 @@ public:
 	static TurnType transformTurnTypeViaZ2Rotation(TurnType turnType); //This function is used to transform turns like T-perm onto the flipped cube
 	static TurnTypeOrder transformTurnTypeOrderViaZ2Rotation(TurnTypeOrder const & turnTypeOrder); //Applies Z2Rotation to every turnType
 
+	static TurnType transformTurnTypeViaYRotation(TurnType turnType); //This function is used to transform F2L-solving turns around the cube
+	static TurnTypeOrder transformTurnTypeOrderViaYRotation(TurnTypeOrder const & turnTypeOrder); //Applies YRotation to every turnType
+
 public:
 	static bool isStringConvertibleIntoTurns(std::string const & string, TurnTypeOrder& turns);
 	static bool isStringConvertibleIntoTurnType(std::string const & string, TurnType& turnType);

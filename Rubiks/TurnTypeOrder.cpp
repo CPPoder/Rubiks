@@ -74,6 +74,11 @@ const TurnTypeOrder OLL::Corners4SameDircetion = initializeStaticTurnTypeOrder("
 
 
 
+const TurnTypeOrder F2L::InsertEdgeRight = initializeStaticTurnTypeOrder("L'U'LUFUF'");
+const TurnTypeOrder F2L::InsertEdgeLeft = initializeStaticTurnTypeOrder("RUR'U'F'U'F");
+const TurnTypeOrder F2L::FlipEdge = initializeStaticTurnTypeOrder("L'ULU'FU2F'U2FU'F'");
+
+
 
 const std::map<std::string, TurnTypeOrder const *> PLL::mapOfTurnTypeOrderNames =
 {
@@ -172,5 +177,68 @@ bool OLL::isStringOLLName(std::string const & string, TurnTypeOrder& turnTypeOrd
 		return false;
 	}
 }
+
+
+
+
+const std::list<TurnTypeOrder const *> F2L::listOfSecondLayerAlgorithms = []()
+{
+	std::list<TurnTypeOrder const *> tempList;
+	for (auto const & elem : F2L::getListOfSecondLayerAlgorithms())
+	{
+		tempList.push_back(new TurnTypeOrder(elem));
+	}
+	return std::move(tempList);
+}();
+
+
+
+const std::list<TurnTypeOrder> F2L::getListOfSecondLayerAlgorithms()
+{
+	std::list<TurnTypeOrder> const listOfSimpleF2LTurns = {F2L::InsertEdgeRight, F2L::InsertEdgeLeft, F2L::FlipEdge};
+
+	//Create tempList, which contains all simple turns in all 4 directions! Using these, one can almost solve the cube!
+	//The remaining difficulty is that these turns need the edge in the down plane! But what if an edge is caught in some others F2L-edge location?
+	//To handle this: Combine all turns from tempList with beforehand executed extractions as setup moves in the later solve algorithm!
+
+	std::list<TurnTypeOrder> tempList;
+	for (auto simpleTurn : listOfSimpleF2LTurns)
+	{
+		tempList.push_back(simpleTurn);
+		simpleTurn = Turn::transformTurnTypeOrderViaYRotation(simpleTurn);
+		tempList.push_back(simpleTurn);
+		simpleTurn = Turn::transformTurnTypeOrderViaYRotation(simpleTurn);
+		tempList.push_back(simpleTurn);
+		simpleTurn = Turn::transformTurnTypeOrderViaYRotation(simpleTurn);
+		tempList.push_back(simpleTurn);
+	}
+
+	return std::move(tempList);
+}
+
+
+
+const std::list<TurnTypeOrder> F2L::getListOfExtractions()
+{
+	std::list<TurnTypeOrder> const listOfSimpleExtractionTurns = { F2L::InsertEdgeRight, F2L::InsertEdgeLeft };
+
+	std::list<TurnTypeOrder> tempList;
+	for (auto simpleTurn : listOfSimpleExtractionTurns)
+	{
+		tempList.push_back(simpleTurn);
+		simpleTurn = Turn::transformTurnTypeOrderViaYRotation(simpleTurn);
+		tempList.push_back(simpleTurn);
+		simpleTurn = Turn::transformTurnTypeOrderViaYRotation(simpleTurn);
+		tempList.push_back(simpleTurn);
+		simpleTurn = Turn::transformTurnTypeOrderViaYRotation(simpleTurn);
+		tempList.push_back(simpleTurn);
+	}
+
+	return std::move(tempList);
+}
+
+
+
+
 
 

@@ -830,6 +830,72 @@ TurnTypeOrder Turn::transformTurnTypeOrderViaZ2Rotation(TurnTypeOrder const & tu
 
 
 
+
+TurnType Turn::transformTurnTypeViaYRotation(TurnType turnType)
+{
+	switch (turnType)
+	{
+	case TurnType::Up:
+		return TurnType::Up;
+	case TurnType::UpInverse:
+		return TurnType::UpInverse;
+	case TurnType::Up2:
+		return TurnType::Up2;
+	case TurnType::Down:
+		return TurnType::Down;
+	case TurnType::DownInverse:
+		return TurnType::DownInverse;
+	case TurnType::Down2:
+		return TurnType::Down2;
+	case TurnType::Front:
+		return TurnType::Right;
+	case TurnType::FrontInverse:
+		return TurnType::RightInverse;
+	case TurnType::Front2:
+		return TurnType::Right2;
+	case TurnType::Back:
+		return TurnType::Left;
+	case TurnType::BackInverse:
+		return TurnType::LeftInverse;
+	case TurnType::Back2:
+		return TurnType::Left2;
+	case TurnType::Right:
+		return TurnType::Back;
+	case TurnType::RightInverse:
+		return TurnType::BackInverse;
+	case TurnType::Right2:
+		return TurnType::Back2;
+	case TurnType::Left:
+		return TurnType::Front;
+	case TurnType::LeftInverse:
+		return TurnType::FrontInverse;
+	case TurnType::Left2:
+		return TurnType::Front2;
+	}
+}
+
+
+
+
+TurnTypeOrder Turn::transformTurnTypeOrderViaYRotation(TurnTypeOrder const & turnTypeOrder)
+{
+	TurnTypeOrder t;
+	t.reserve(turnTypeOrder.size());
+	for (auto const & turn : turnTypeOrder)
+	{
+		t.push_back(Turn::transformTurnTypeViaYRotation(turn));
+	}
+	return std::move(t);
+}
+
+
+
+
+
+
+
+
+
 bool Turn::isStringConvertibleIntoTurns(std::string const & string, TurnTypeOrder& turns)
 {
 	//Handle empty turns

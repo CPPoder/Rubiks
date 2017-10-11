@@ -89,6 +89,20 @@ public:
 
 
 
+struct F2L
+{
+	static const TurnTypeOrder InsertEdgeRight;		//L'U'LUFUF'
+	static const TurnTypeOrder InsertEdgeLeft;		//RUR'U'F'U'F
+	static const TurnTypeOrder FlipEdge;			//L'ULU'FU2F'U2FU'F'
+
+	static const std::list<TurnTypeOrder const *> listOfSecondLayerAlgorithms;
+	
+	static const std::list<TurnTypeOrder> getListOfSecondLayerAlgorithms(); //Returns the above 3 Turns, but in all directions! Thus, 12 turns!
+	static const std::list<TurnTypeOrder> getListOfExtractions(); //Returns only extraction turns in all directions! Thus, 8 turns!
+};
+
+
+
 
 #endif //TURNTYPEORDER_HPP
 

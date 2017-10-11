@@ -369,7 +369,7 @@ TurnTypeOrder Solver::solveOneOfSeveralComparators(Cube const & cube, SolveAttri
 }
 
 
-TurnTypeOrder Solver::quicksolve(Cube const & cube)
+TurnTypeOrder Solver::quicksolve(Cube const & cube, bool giveOutputOnTerminal)
 {
 	//Copy cube
 	Cube c(cube);
@@ -377,78 +377,87 @@ TurnTypeOrder Solver::quicksolve(Cube const & cube)
 	//Create useless ostream object
 	std::stringbuf buffer;
 	std::ostream log(&buffer);
+
+	//Collect outputs in some stringbuf instead of cout, if giveOutputOnTerminal is false
+	std::stringbuf coutBuffer;
+	std::ostream oStream(&coutBuffer);
+	if (giveOutputOnTerminal)
+	{
+		oStream.rdbuf(std::cout.rdbuf());
+	}
 	
 	//Check if the number of all colors is 8
-	std::cout << "Check numbers of colors...";
+	oStream << "Check numbers of colors...";
 	std::map<Color, unsigned int> colorNumbers;
 	if (!c.numberOfAllColorsIs8(colorNumbers))
 	{
 		throw Cube::InvalidCubeException(Cube::InvalidCubeException::Reason::NUMBER_PER_COLOR_IS_NOT_8, Cube::InvalidCubeException::Info(colorNumbers));
 	}
-	std::cout << "Done!" << std::endl;
+	oStream << "Done!" << std::endl;
 
 	//Check if all pieces of the cube are valid
-	std::cout << "Check for invalid pieces...";
+	oStream << "Check for invalid pieces...";
 	Pieces invalidPieces;
 	if (!c.allPiecesValid(invalidPieces))
 	{
 		throw Cube::InvalidCubeException(Cube::InvalidCubeException::Reason::PIECES_ARE_INVALID, Cube::InvalidCubeException::Info(invalidPieces));
 	}
-	std::cout << "Done!" << std::endl;
+	oStream << "Done!" << std::endl;
 
 	//Solve
 	TurnTypeOrder fullTurns;
 
+	oStream << "Solve white cross...";
 	TurnTypeOrder whiteCrossTurns;
 	Solver::solveWhiteCross(c, log, whiteCrossTurns);
 	c.turn(whiteCrossTurns);
 	fullTurns += whiteCrossTurns;
+	oStream << "Done!" << std::endl;
 
+	oStream << "Solve F2L...";
 	TurnTypeOrder F2LTurns;
 	//Solver::solveF2L(c, log, F2LTurns);
 	//Solver::solveF2LMultithreaded(c, log, F2LTurns);
-	Solver::solveF2LByCheckingMultiplePairsAtOnce(c, log, F2LTurns);
+	//Solver::solveF2LByCheckingMultiplePairsAtOnce(c, log, F2LTurns);
+	Solver::solveF2LByCheckingMultiplePairsAtOnceAndFirstInsertingCorners(c, log, F2LTurns);
 	c.turn(F2LTurns);
 	fullTurns += F2LTurns;
+	oStream << "Done!" << std::endl;
 	
+	oStream << "Solve OLL...";
 	TurnTypeOrder OLLTurns;
 	Solver::solveOLL(c, log, OLLTurns);
 	c.turn(OLLTurns);
 	fullTurns += OLLTurns;
+	oStream << "Done!" << std::endl;
 
+	oStream << "Solve PLL...";
 	TurnTypeOrder PLLTurns;
 	Solver::solvePLL(c, log, PLLTurns);
 	c.turn(PLLTurns);
 	fullTurns += PLLTurns;
+	oStream << "Done!" << std::endl;
 
 
-	std::cout << c;
 	return fullTurns;
 }
 
 
 bool Solver::solveWhiteCross(Cube const & c, std::ostream & log, TurnTypeOrder& t)
 {
-	std::cout << "Solve white cross...";
-
 	Cube cubeCopy(c);
 	TurnTypeOrder pureCrossTurns = Solver::solve(cubeCopy, SolveAttributes(SolveTurns::ALL, Comparator::PureWhiteCross, InterruptProperties(InterruptProperties::Type::NEVER)), {}, log);
 	cubeCopy.turn(pureCrossTurns);
 	TurnTypeOrder fullCrossTurns = Solver::solve(cubeCopy, SolveAttributes(SolveTurns::ALL, Comparator::FullWhiteCross, InterruptProperties(InterruptProperties::Type::NEVER)), {}, log);
 
 	t = pureCrossTurns + fullCrossTurns;
-	std::cout << "Done!" << std::endl;
 	return true;
 }
 
 
 bool Solver::solveF2L(Cube const & c, std::ostream & log, TurnTypeOrder& t)
 {
-	std::cout << "Solve F2L...";
-	
 	Solver::solveF2LusingPairOrder(c, log, t, { F2LPairTargetPos::LEFT_BACK, F2LPairTargetPos::LEFT_FRONT, F2LPairTargetPos::RIGHT_BACK, F2LPairTargetPos::RIGHT_FRONT });
-
-	std::cout << "Done!" << std::endl;
 	return true;
 }
 
@@ -564,8 +573,6 @@ void Solver::solveF2LusingPairOrderForMultithreading(Cube const & c, TurnTypeOrd
 
 bool Solver::solveF2LMultithreaded(Cube const & c, std::ostream & log, TurnTypeOrder& t)
 {
-	std::cout << "Solve F2L...";
-
 	//////////////////////////////
 	//Generate array of pairOrders
 	unsigned int constexpr permNum = 24u;
@@ -643,7 +650,6 @@ bool Solver::solveF2LMultithreaded(Cube const & c, std::ostream & log, TurnTypeO
 		{
 			TurnTypeOrder correctSolution = arrayOfSolvingTurnTypeOrders.at(i);
 			t = correctSolution;
-			std::cout << "Done!" << std::endl;
 			return true;
 		}
 	}
@@ -652,8 +658,6 @@ bool Solver::solveF2LMultithreaded(Cube const & c, std::ostream & log, TurnTypeO
 
 bool Solver::solveF2LByCheckingMultiplePairsAtOnce(Cube const & c, std::ostream & log, TurnTypeOrder& t) //This function has put out "Remaining pairs: 4 Remaining pairs: 4 Remaining pairs: 4 ..."! But I can't find the error in this function! So it is probably in the solve function!
 {
-	std::cout << "Solve F2L...";
-
 	std::function<Comparator const & (F2LPairTargetPos const &)> mapPairPosToComparator = [](F2LPairTargetPos const & pairPos) -> Comparator const &
 	{
 		switch (pairPos)
@@ -706,7 +710,170 @@ bool Solver::solveF2LByCheckingMultiplePairsAtOnce(Cube const & c, std::ostream 
 		std::cout << "Remaining pairs: " << setOfRemainingPairTargetPositions.size() << std::endl;
 	}
 
-	std::cout << "Done!" << std::endl;
+	return true;
+}
+
+
+bool Solver::solveF2LByCheckingMultiplePairsAtOnceAndFirstInsertingCorners(Cube const & c, std::ostream & log, TurnTypeOrder& t) //This function has put out "Remaining pairs: 4 Remaining pairs: 4 Remaining pairs: 4 ..."! But I can't find the error in this function! So it is probably in the solve function!
+{
+	std::function<Comparator const & (F2LPairTargetPos const &)> mapPairPosToComparator = [](F2LPairTargetPos const & pairPos) -> Comparator const &
+	{
+		switch (pairPos)
+		{
+		case F2LPairTargetPos::LEFT_BACK:
+			return Comparator::Pair::BackLeft;
+			break;
+		case F2LPairTargetPos::LEFT_FRONT:
+			return Comparator::Pair::FrontLeft;
+			break;
+		case F2LPairTargetPos::RIGHT_BACK:
+			return Comparator::Pair::BackRight;
+			break;
+		case F2LPairTargetPos::RIGHT_FRONT:
+			return Comparator::Pair::FrontRight;
+			break;
+		}
+	};
+
+	std::function<Comparator const & (F2LPairTargetPos const &)> mapPairPosToCornerComparator = [](F2LPairTargetPos const & pairPos) -> Comparator const &
+	{
+		switch (pairPos)
+		{
+		case F2LPairTargetPos::LEFT_BACK:
+			return Comparator::FullCorner::UpBackLeft;
+			break;
+		case F2LPairTargetPos::LEFT_FRONT:
+			return Comparator::FullCorner::UpFrontLeft;
+			break;
+		case F2LPairTargetPos::RIGHT_BACK:
+			return Comparator::FullCorner::UpBackRight;
+			break;
+		case F2LPairTargetPos::RIGHT_FRONT:
+			return Comparator::FullCorner::UpFrontRight;
+			break;
+		}
+	};
+
+	std::function<Comparator const & (F2LPairTargetPos const &)> mapPairPosToEdgeComparator = [](F2LPairTargetPos const & pairPos) -> Comparator const &
+	{
+		switch (pairPos)
+		{
+		case F2LPairTargetPos::LEFT_BACK:
+			return Comparator::Edge::BackLeft;
+			break;
+		case F2LPairTargetPos::LEFT_FRONT:
+			return Comparator::Edge::FrontLeft;
+			break;
+		case F2LPairTargetPos::RIGHT_BACK:
+			return Comparator::Edge::BackRight;
+			break;
+		case F2LPairTargetPos::RIGHT_FRONT:
+			return Comparator::Edge::FrontRight;
+			break;
+		}
+	};
+
+	Cube cubeCopy(c);
+	t = {};
+	std::list<F2LPairTargetPos> const listOfAllPairTargetPositions{ F2LPairTargetPos::LEFT_BACK, F2LPairTargetPos::LEFT_FRONT, F2LPairTargetPos::RIGHT_BACK, F2LPairTargetPos::RIGHT_FRONT };
+
+	//First, insert all corners
+	{
+		std::set<F2LPairTargetPos> setOfRemainingPairTargetPositions(listOfAllPairTargetPositions.begin(), listOfAllPairTargetPositions.end());
+		std::set<F2LPairTargetPos> setOfAlreadyUsedPairTargetPositions;
+
+		while (!setOfRemainingPairTargetPositions.empty())
+		{
+			Comparator baseComparator = Comparator::FullWhiteCross;
+			for (auto pairPos : setOfAlreadyUsedPairTargetPositions)
+			{
+				baseComparator = baseComparator && mapPairPosToCornerComparator(pairPos);
+			}
+
+			std::list<std::pair<Comparator, F2LPairTargetPos>> extraComparatorPairs;
+			for (auto pairPos : setOfRemainingPairTargetPositions)
+			{
+				extraComparatorPairs.push_back(std::make_pair(mapPairPosToCornerComparator(pairPos), pairPos));
+			}
+
+			F2LPairTargetPos solvedPairPos;
+			TurnTypeOrder solvingTurns = Solver::solveOneOfSeveralComparators(cubeCopy, SolveAttributes(SolveTurns::QUARTER_TURNS, baseComparator, InterruptProperties(InterruptProperties::Type::NEVER)), extraComparatorPairs, {}, solvedPairPos, log);
+			t += solvingTurns;
+			cubeCopy.turn(solvingTurns);
+
+			setOfRemainingPairTargetPositions.erase(solvedPairPos);
+			setOfAlreadyUsedPairTargetPositions.insert(solvedPairPos);
+
+			//std::cout << "Remaining pairs: " << setOfRemainingPairTargetPositions.size() << std::endl;
+		}
+	}
+
+	//Secondly, solve full pairs
+	{
+		std::list<F2LPairTargetPos> listOfCurrentPairPos;
+		for (auto pairPos : listOfAllPairTargetPositions)
+		{
+			listOfCurrentPairPos.push_back(pairPos);
+
+			Comparator cmp = Comparator::FirstLayer;
+			for (auto cmpPairPos : listOfCurrentPairPos)
+			{
+				cmp = cmp && mapPairPosToEdgeComparator(cmpPairPos);
+			}
+
+			std::list<TurnTypeOrder> listOfSetupMoves = { {}, {TurnType::Down}, {TurnType::DownInverse}, {TurnType::Down2 } };
+			std::list<TurnTypeOrder> const listOfExtractions = F2L::getListOfExtractions();
+			for (auto const & extraction : listOfExtractions)
+			{
+				listOfSetupMoves.push_back(extraction);
+				listOfSetupMoves.push_back(extraction + TurnType::Down);
+				listOfSetupMoves.push_back(extraction + TurnType::DownInverse);
+				listOfSetupMoves.push_back(extraction + TurnType::Down2);
+			}
+
+			TurnTypeOrder solvingTurns;
+			if (!Solver::tryTurnsToSolve(cubeCopy, cmp, F2L::listOfSecondLayerAlgorithms, listOfSetupMoves, solvingTurns))
+			{
+				std::cout << "Could not solve! Learn programming!" << std::endl;
+			}
+			t += solvingTurns;
+			cubeCopy.turn(solvingTurns);
+		}
+
+		
+	}
+	
+	//Old full pairs solving algorithm
+	//{
+	//	std::set<F2LPairTargetPos> setOfRemainingPairTargetPositions(listOfAllPairTargetPositions.begin(), listOfAllPairTargetPositions.end());
+	//	std::set<F2LPairTargetPos> setOfAlreadyUsedPairTargetPositions;
+	//
+	//	while (!setOfRemainingPairTargetPositions.empty())
+	//	{
+	//		Comparator baseComparator = Comparator::FullWhiteCross;
+	//		for (auto pairPos : setOfAlreadyUsedPairTargetPositions)
+	//		{
+	//			baseComparator = baseComparator && mapPairPosToComparator(pairPos);
+	//		}
+	//
+	//		std::list<std::pair<Comparator, F2LPairTargetPos>> extraComparatorPairs;
+	//		for (auto pairPos : setOfRemainingPairTargetPositions)
+	//		{
+	//			extraComparatorPairs.push_back(std::make_pair(mapPairPosToComparator(pairPos), pairPos));
+	//		}
+	//
+	//		F2LPairTargetPos solvedPairPos;
+	//		TurnTypeOrder solvingTurns = Solver::solveOneOfSeveralComparators(cubeCopy, SolveAttributes(SolveTurns::QUARTER_TURNS, baseComparator, InterruptProperties(InterruptProperties::Type::NEVER)), extraComparatorPairs, {}, solvedPairPos, log);
+	//		t += solvingTurns;
+	//		cubeCopy.turn(solvingTurns);
+	//
+	//		setOfRemainingPairTargetPositions.erase(solvedPairPos);
+	//		setOfAlreadyUsedPairTargetPositions.insert(solvedPairPos);
+	//
+	//		std::cout << "Remaining pairs: " << setOfRemainingPairTargetPositions.size() << std::endl;
+	//	}
+	//}
+
 	return true;
 }
 
@@ -760,7 +927,6 @@ bool Solver::solveOLL(Cube const & c, std::ostream & log, TurnTypeOrder& t)
 	};
 
 	//Solve yellow cross
-	std::cout << "Solve OLL...";
 	TurnTypeOrder crossSolvingTurns;
 	unsigned int numberOfYellows = 0;
 	Plane yellowPlane = c.at(PlanePos::DOWN);
@@ -898,15 +1064,12 @@ bool Solver::solveOLL(Cube const & c, std::ostream & log, TurnTypeOrder& t)
 	}
 
 	t = (crossSolvingTurns + cornersSolvingTurns);
-	std::cout << "Done!" << std::endl;
 	return true;
 }
 
 
 bool Solver::solvePLL(Cube const & c, std::ostream & log, TurnTypeOrder& t)
 {
-	std::cout << "Solve PLL...";
-
 	TurnTypeOrder pllTurns;
 	if (!Solver::tryTurnsToSolve(c, Comparator::FullCube, PLL::listOfPLLs, { {},{ TurnType::Down },{ TurnType::DownInverse },{ TurnType::Down2 } }, pllTurns))
 	{
@@ -914,18 +1077,7 @@ bool Solver::solvePLL(Cube const & c, std::ostream & log, TurnTypeOrder& t)
 	}
 
 	t = pllTurns;
-	std::cout << "Done!" << std::endl;
 	return true;
-}
-
-template <typename T> std::string listOutput(std::list<T> const & list)
-{
-	std::stringstream stream;
-	for (auto const & elem : list)
-	{
-		stream << elem << " ";
-	}
-	return stream.str();
 }
 
 

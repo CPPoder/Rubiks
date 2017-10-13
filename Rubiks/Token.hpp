@@ -3,6 +3,7 @@
 
 
 #include <iostream>
+#include <array>
 
 
 class KeywordToken;
@@ -48,6 +49,7 @@ public:
 	static const KeywordToken TurnToken;
 	static const KeywordToken InputToken;
 	static const KeywordToken QuicksolveToken;
+	static const KeywordToken HelpToken;
 
 public:
 	static KeywordToken* tryDynamicCastToKeywordToken(Token* token);
@@ -76,8 +78,12 @@ public:
 		clear,
 		turn,
 		input,
-		quicksolve
+		quicksolve,
+		help,
+		NUM_OF_KEYWORDS
 	};
+
+	static const std::array<Keyword, static_cast<int>(Keyword::NUM_OF_KEYWORDS)> arrayOfAllKeywords;
 
 private:
 	Keyword mKeyword;

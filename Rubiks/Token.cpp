@@ -19,6 +19,7 @@ const KeywordToken Token::ClearToken = KeywordToken(KeywordToken::Keyword::clear
 const KeywordToken Token::TurnToken = KeywordToken(KeywordToken::Keyword::turn);
 const KeywordToken Token::InputToken = KeywordToken(KeywordToken::Keyword::input);
 const KeywordToken Token::QuicksolveToken = KeywordToken(KeywordToken::Keyword::quicksolve);
+const KeywordToken Token::HelpToken = KeywordToken(KeywordToken::Keyword::help);
 
 
 KeywordToken* Token::tryDynamicCastToKeywordToken(Token* token)
@@ -47,6 +48,21 @@ UnidentifiedBlockToken* Token::tryDynamicCastToUnidentifiedBlockToken(Token* tok
 
 ////////////////////
 //KeywordToken Class
+
+const std::array<KeywordToken::Keyword, static_cast<int>(KeywordToken::Keyword::NUM_OF_KEYWORDS)> KeywordToken::arrayOfAllKeywords = 
+{
+	Keyword::exit,
+	Keyword::solve,
+	Keyword::Cube,
+	Keyword::Turns,
+	Keyword::echo,
+	Keyword::assign,
+	Keyword::clear,
+	Keyword::turn,
+	Keyword::input,
+	Keyword::quicksolve,
+	Keyword::help
+};
 
 KeywordToken::KeywordToken(Keyword const & keyword)
 	: mKeyword(keyword)

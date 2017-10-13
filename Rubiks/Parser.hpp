@@ -9,6 +9,7 @@
 
 #include "Token.hpp"
 #include "Command.hpp"
+#include "Help.hpp"
 
 
 class Parser
@@ -43,6 +44,7 @@ private:
 	static Command handleTurnTokenCase(std::list<Token*> const & listOfTokenPointers);
 	static Command handleInputTokenCase(std::list<Token*> const & listOfTokenPointers);
 	static Command handleQuicksolveTokenCase(std::list<Token*> const & listOfTokenPointers);
+	static Command handleHelpTokenCase(std::list<Token*> const & listOfTokenPointers);
 
 
 private:

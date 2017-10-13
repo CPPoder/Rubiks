@@ -71,6 +71,9 @@ void Framework::run()
 		case Command::Type::Input:
 			this->inputCube(cmd.getInputSpecification().name);
 			break;
+		case Command::Type::Help:
+			std::cout << cmd.getHelpSpecification().message;
+			break;
 		}
 	}
 }

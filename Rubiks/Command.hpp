@@ -21,7 +21,8 @@ public:
 		Clear,
 		Turn,
 		Input,
-		Quicksolve
+		Quicksolve,
+		Help
 	};
 
 	struct InvalidSpecification
@@ -100,6 +101,15 @@ public:
 		QuicksolveSpecification(std::string const & _cube, std::string const & _writeTo);
 	};
 
+	struct HelpSpecification
+	{
+		std::string message;
+
+		HelpSpecification() = default;
+		HelpSpecification(std::string const & _message);
+
+	};
+
 
 private:
 	Type mType;
@@ -113,6 +123,7 @@ private:
 	TurnSpecification turnSpecification;
 	InputSpecification inputSpecification;
 	QuicksolveSpecification quicksolveSpecification;
+	HelpSpecification helpSpecification;
 
 public:
 	Command();
@@ -131,6 +142,7 @@ public:
 	TurnSpecification getTurnSpecification() const;
 	InputSpecification getInputSpecification() const;
 	QuicksolveSpecification getQuicksolveSpecification() const;
+	HelpSpecification getHelpSpecification() const;
 
 public:
 	void setInvalid(InvalidSpecification const & invalidSpecification);
@@ -145,6 +157,7 @@ public:
 	void setTurn(TurnSpecification const & turnSpecification);
 	void setInput(InputSpecification const & inputSpecification);
 	void setQuicksolve(QuicksolveSpecification const & quicksolveSpecification);
+	void setHelp(HelpSpecification const & helpSpecification);
 
 private:
 	void clearSpecifications();

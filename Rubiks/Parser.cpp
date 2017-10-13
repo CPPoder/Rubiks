@@ -140,6 +140,9 @@ Command Parser::interprete(std::list<Token*> const & tokens)
 		case KeywordToken::Keyword::quicksolve:
 			return Parser::handleQuicksolveTokenCase(tokens);
 			break;
+		case KeywordToken::Keyword::help:
+			return Parser::handleHelpTokenCase(tokens);
+			break;
 		}
 	}
 
@@ -214,6 +217,11 @@ bool Parser::isBlockKeyword(std::string const & block, KeywordToken& keywordToke
 	if (block == "quicksolve")
 	{
 		keywordTokenReturn = Token::QuicksolveToken;
+		return true;
+	}
+	if (block == "help")
+	{
+		keywordTokenReturn = Token::HelpToken;
 		return true;
 	}
 
@@ -499,6 +507,65 @@ Command Parser::handleInputTokenCase(std::list<Token*> const & listOfTokenPointe
 		return Command::INVALID;
 	}
 }
+
+
+
+
+Command Parser::handleHelpTokenCase(std::list<Token*> const & listOfTokenPointers)
+{
+	//If this function is called, the first Token is the Help KeywordToken for sure!
+	//This function must check that all tokens are KeywordTokens!
+	//If there are more than 2 tokens, this function must check that all but the last are the help token!
+	try
+	{
+		Command cmd;
+
+		//Check that all tokens are KeywordTokens
+		for (auto token : listOfTokenPointers)
+		{
+			if (token->getType() == Token::Type::UnidentifiedBlock)
+			{
+				throw InvalidCommandException();
+			}
+		}
+		
+		//Handle size==1 case
+		if (listOfTokenPointers.size() == 1)
+		{
+			cmd.setHelp(Command::HelpSpecification(Help::getOverview()));
+			return cmd;
+		}
+
+		//Handle size==2 case
+		if (listOfTokenPointers.size() == 2)
+		{
+			KeywordToken* keywordToken = Token::tryDynamicCastToKeywordToken(listOfTokenPointers.back());
+			cmd.setHelp(Command::HelpSpecification(Help::getHelpFor(*keywordToken)));
+			return cmd;
+		}
+
+		//Handle size>=3 case
+		std::list<KeywordToken*> listOfKeywordTokenPointers;
+		for (auto token : listOfTokenPointers)
+		{
+			listOfKeywordTokenPointers.push_back(Token::tryDynamicCastToKeywordToken(token));
+		}
+		for (std::list<KeywordToken*>::reverse_iterator revIt = ++listOfKeywordTokenPointers.rbegin(); revIt != listOfKeywordTokenPointers.rend(); ++revIt) //Check that all but the last are help tokens
+		{
+			if ((*revIt)->getKeyword() != KeywordToken::Keyword::help)
+			{
+				throw InvalidCommandException();
+			}
+		}
+		cmd.setHelp(Command::HelpSpecification(Help::getHelpForRecursive(listOfKeywordTokenPointers.size(), *listOfKeywordTokenPointers.back())));
+		return cmd;
+	}
+	catch (InvalidCommandException exception) //Exceptions are used to catch all invalid command cases!
+	{
+		return Command::INVALID;
+	}
+}
+
 
 
 

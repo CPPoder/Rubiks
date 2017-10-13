@@ -72,6 +72,9 @@
     <ClCompile Include="Solver.cpp">
       <Filter>Quelldateien\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Help.cpp">
+      <Filter>Quelldateien\Parser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parser.hpp">
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="MutexProtectedClass.hpp">
       <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Help.hpp">
+      <Filter>Headerdateien\Parser</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

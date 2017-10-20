@@ -31,6 +31,9 @@
     <Filter Include="Quelldateien\Graphics">
       <UniqueIdentifier>{14dde543-9ff7-4d05-abe5-ad762fb1ca54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{2fec3ec9-93a6-4728-aa8a-294724edd9fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -82,6 +85,21 @@
       <Filter>Quelldateien\Parser</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GLADInitializer.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GLFWInitializer.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\glad\src\glad.c">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
       <Filter>Quelldateien\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -140,5 +158,28 @@
     <ClInclude Include="Renderer.hpp">
       <Filter>Headerdateien\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="GLFWInitializer.hpp">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GLADInitializer.hpp">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GLIncludes.hpp">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.hpp">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.hpp">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Shader\Simple.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Data\Shader\Simple.vs">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

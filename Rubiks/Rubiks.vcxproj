@@ -72,12 +72,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Udo\Documents\glfw-3.2.1.bin.WIN32\include\GLFW;C:\Users\Udo\Documents\glad\include;C:\Users\Udo\Documents\glm;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\Udo\Documents\glfw-3.2.1.bin.WIN32\include\GLFW;C:\Users\Udo\Documents\glad\include;C:\Users\Udo\Documents\glm;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -93,6 +95,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>C:\Users\Udo\Documents\glfw-3.2.1.bin.WIN32\lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -121,6 +125,8 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Users\Udo\Documents\glfw-3.2.1.bin.WIN32\lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -143,16 +149,21 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\glad\src\glad.c" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Framework.cpp" />
+    <ClCompile Include="GLADInitializer.cpp" />
+    <ClCompile Include="GLFWInitializer.cpp" />
     <ClCompile Include="Help.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Rubiks.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Solver.cpp" />
     <ClCompile Include="Token.cpp" />
     <ClCompile Include="Turn.cpp" />
@@ -161,24 +172,33 @@
     <ClCompile Include="TurnTypeOrder.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.hpp" />
     <ClInclude Include="Clock.hpp" />
     <ClInclude Include="Color.hpp" />
     <ClInclude Include="colorOutput.h" />
     <ClInclude Include="Command.hpp" />
     <ClInclude Include="Cube.hpp" />
     <ClInclude Include="Framework.hpp" />
+    <ClInclude Include="GLADInitializer.hpp" />
+    <ClInclude Include="GLFWInitializer.hpp" />
+    <ClInclude Include="GLIncludes.hpp" />
     <ClInclude Include="Help.hpp" />
     <ClInclude Include="MutexProtectedClass.hpp" />
     <ClInclude Include="Parser.hpp" />
     <ClInclude Include="Plane.hpp" />
     <ClInclude Include="PlanePos.hpp" />
     <ClInclude Include="Renderer.hpp" />
+    <ClInclude Include="Shader.hpp" />
     <ClInclude Include="Solver.hpp" />
     <ClInclude Include="Token.hpp" />
     <ClInclude Include="Turn.hpp" />
     <ClInclude Include="TurnOrder.hpp" />
     <ClInclude Include="TurnType.hpp" />
     <ClInclude Include="TurnTypeOrder.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Shader\Simple.fs" />
+    <None Include="Data\Shader\Simple.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

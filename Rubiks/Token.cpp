@@ -20,6 +20,7 @@ const KeywordToken Token::TurnToken = KeywordToken(KeywordToken::Keyword::turn);
 const KeywordToken Token::InputToken = KeywordToken(KeywordToken::Keyword::input);
 const KeywordToken Token::QuicksolveToken = KeywordToken(KeywordToken::Keyword::quicksolve);
 const KeywordToken Token::HelpToken = KeywordToken(KeywordToken::Keyword::help);
+const KeywordToken Token::ShowToken = KeywordToken(KeywordToken::Keyword::show);
 
 
 KeywordToken* Token::tryDynamicCastToKeywordToken(Token* token)
@@ -61,7 +62,8 @@ const std::array<KeywordToken::Keyword, static_cast<int>(KeywordToken::Keyword::
 	Keyword::turn,
 	Keyword::input,
 	Keyword::quicksolve,
-	Keyword::help
+	Keyword::help,
+	Keyword::show
 };
 
 KeywordToken::KeywordToken(Keyword const & keyword)

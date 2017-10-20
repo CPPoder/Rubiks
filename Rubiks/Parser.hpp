@@ -45,7 +45,7 @@ private:
 	static Command handleInputTokenCase(std::list<Token*> const & listOfTokenPointers);
 	static Command handleQuicksolveTokenCase(std::list<Token*> const & listOfTokenPointers);
 	static Command handleHelpTokenCase(std::list<Token*> const & listOfTokenPointers);
-
+	static Command handleShowTokenCase(std::list<Token*> const & listOfTokenPointers);
 
 private:
 	class InvalidCommandException

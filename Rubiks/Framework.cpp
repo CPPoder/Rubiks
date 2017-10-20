@@ -74,6 +74,12 @@ void Framework::run()
 		case Command::Type::Help:
 			std::cout << cmd.getHelpSpecification().message;
 			break;
+		case Command::Type::Show:
+			if (!this->showCube(cmd.getShowSpecification().name))
+			{
+				std::cout << "There is no Cube object named " << cmd.getShowSpecification().name << "!" << std::endl;
+			}
+			break;
 		}
 	}
 }
@@ -345,7 +351,16 @@ bool Framework::quicksolveCube(std::string const & cube, std::string const & wri
 	}
 }
 
-
+bool Framework::showCube(std::string const & name)
+{
+	Cube* cube;
+	if (this->findCubeNamed(name, cube))
+	{
+		Renderer::showCube(*cube);
+		return true;
+	}
+	return false;
+}
 
 
 

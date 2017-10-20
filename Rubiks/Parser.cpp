@@ -143,6 +143,9 @@ Command Parser::interprete(std::list<Token*> const & tokens)
 		case KeywordToken::Keyword::help:
 			return Parser::handleHelpTokenCase(tokens);
 			break;
+		case KeywordToken::Keyword::show:
+			return Parser::handleShowTokenCase(tokens);
+			break;
 		}
 	}
 
@@ -222,6 +225,11 @@ bool Parser::isBlockKeyword(std::string const & block, KeywordToken& keywordToke
 	if (block == "help")
 	{
 		keywordTokenReturn = Token::HelpToken;
+		return true;
+	}
+	if (block == "show")
+	{
+		keywordTokenReturn = Token::ShowToken;
 		return true;
 	}
 
@@ -565,6 +573,40 @@ Command Parser::handleHelpTokenCase(std::list<Token*> const & listOfTokenPointer
 		return Command::INVALID;
 	}
 }
+
+
+
+
+Command Parser::handleShowTokenCase(std::list<Token*> const & listOfTokenPointers)
+{
+	//If this function is called, the first Token is the Show KeywordToken for sure!
+	//Therefore, this function must check that there are exactly 2 tokens and that the second one is a name!
+	try
+	{
+		if ((listOfTokenPointers.size() != 2u))
+		{
+			throw InvalidCommandException();
+		}
+		std::list<Token*>::const_iterator it = listOfTokenPointers.begin();
+		++it;
+		Token* token = *it;
+		if (token->getType() == Token::Type::Keyword)
+		{
+			throw InvalidCommandException();
+		}
+		UnidentifiedBlockToken* uToken = Token::tryDynamicCastToUnidentifiedBlockToken(token);
+		Command cmd;
+		cmd.setShow(Command::ShowSpecification(uToken->getBlockText()));
+		return cmd;
+	}
+	catch (InvalidCommandException exception) //Exceptions are used to catch all invalid command cases!
+	{
+		return Command::INVALID;
+	}
+}
+
+
+
 
 
 

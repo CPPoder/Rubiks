@@ -25,6 +25,12 @@
     <Filter Include="Headerdateien\Parser">
       <UniqueIdentifier>{8b333cd1-7db3-4728-bf94-61ac845f2dd4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\Graphics">
+      <UniqueIdentifier>{25e94109-5364-4dcd-aa28-d58cdf7ac975}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Graphics">
+      <UniqueIdentifier>{14dde543-9ff7-4d05-abe5-ad762fb1ca54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -74,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="Help.cpp">
       <Filter>Quelldateien\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="Help.hpp">
       <Filter>Headerdateien\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.hpp">
+      <Filter>Headerdateien\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

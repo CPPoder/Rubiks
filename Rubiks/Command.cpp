@@ -51,6 +51,11 @@ Command::HelpSpecification::HelpSpecification(std::string const & _message)
 {
 }
 
+Command::ShowSpecification::ShowSpecification(std::string const & _name)
+	: name(_name)
+{
+}
+
 
 
 
@@ -136,6 +141,11 @@ Command::QuicksolveSpecification Command::getQuicksolveSpecification() const
 Command::HelpSpecification Command::getHelpSpecification() const
 {
 	return this->helpSpecification;
+}
+
+Command::ShowSpecification Command::getShowSpecification() const
+{
+	return this->showSpecification;
 }
 
 
@@ -229,6 +239,13 @@ void Command::setHelp(HelpSpecification const & helpSpecification)
 	this->helpSpecification = helpSpecification;
 }
 
+void Command::setShow(ShowSpecification const & showSpecification)
+{
+	mType = Type::Show;
+	this->clearSpecifications();
+	this->showSpecification = showSpecification;
+}
+
 
 
 
@@ -244,6 +261,7 @@ void Command::clearSpecifications()
 	this->inputSpecification.name = "";
 	this->quicksolveSpecification = QuicksolveSpecification("", "");
 	this->helpSpecification.message = "";
+	this->showSpecification.name = "";
 }
 
 
@@ -289,6 +307,9 @@ void Command::assignRightCommandToLeftCommand(Command & l, Command const & r)
 		break;
 	case Type::Help:
 		l.setHelp(r.getHelpSpecification());
+		break;
+	case Type::Show:
+		l.setShow(r.getShowSpecification());
 		break;
 	}
 }

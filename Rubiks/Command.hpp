@@ -22,7 +22,8 @@ public:
 		Turn,
 		Input,
 		Quicksolve,
-		Help
+		Help,
+		Show
 	};
 
 	struct InvalidSpecification
@@ -110,6 +111,14 @@ public:
 
 	};
 
+	struct ShowSpecification
+	{
+		std::string name;
+
+		ShowSpecification() = default;
+		ShowSpecification(std::string const & _name);
+	};
+
 
 private:
 	Type mType;
@@ -124,6 +133,7 @@ private:
 	InputSpecification inputSpecification;
 	QuicksolveSpecification quicksolveSpecification;
 	HelpSpecification helpSpecification;
+	ShowSpecification showSpecification;
 
 public:
 	Command();
@@ -143,6 +153,7 @@ public:
 	InputSpecification getInputSpecification() const;
 	QuicksolveSpecification getQuicksolveSpecification() const;
 	HelpSpecification getHelpSpecification() const;
+	ShowSpecification getShowSpecification() const;
 
 public:
 	void setInvalid(InvalidSpecification const & invalidSpecification);
@@ -158,6 +169,7 @@ public:
 	void setInput(InputSpecification const & inputSpecification);
 	void setQuicksolve(QuicksolveSpecification const & quicksolveSpecification);
 	void setHelp(HelpSpecification const & helpSpecification);
+	void setShow(ShowSpecification const & showSpecification);
 
 private:
 	void clearSpecifications();

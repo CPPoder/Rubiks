@@ -151,6 +151,7 @@
     <ClCompile Include="Help.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Rubiks.cpp" />
     <ClCompile Include="Solver.cpp" />
     <ClCompile Include="Token.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Parser.hpp" />
     <ClInclude Include="Plane.hpp" />
     <ClInclude Include="PlanePos.hpp" />
+    <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="Solver.hpp" />
     <ClInclude Include="Token.hpp" />
     <ClInclude Include="Turn.hpp" />

@@ -6,6 +6,7 @@
 #include "Cube.hpp"
 #include "TurnTypeOrder.hpp"
 #include "Solver.hpp"
+#include "Renderer.hpp"
 
 
 #include <iostream>
@@ -45,21 +46,13 @@ private:
 	bool inputCube(std::string const & name);
 	bool solveCube(std::string const & cube, std::string const & writeTo);
 	bool quicksolveCube(std::string const & cube, std::string const & writeTo);
+	bool showCube(std::string const & name);
 
 private:
 	bool findCubeNamed(std::string const & name, Cube*& cube);
 	bool findTurnTypeOrderNamed(std::string const & name, TurnTypeOrder& turnTypeOrder);
 
 };
-
-
-
-
-
-
-
-
-
 
 
 

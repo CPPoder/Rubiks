@@ -50,6 +50,7 @@ public:
 	static const KeywordToken InputToken;
 	static const KeywordToken QuicksolveToken;
 	static const KeywordToken HelpToken;
+	static const KeywordToken ShowToken;
 
 public:
 	static KeywordToken* tryDynamicCastToKeywordToken(Token* token);
@@ -80,6 +81,7 @@ public:
 		input,
 		quicksolve,
 		help,
+		show,
 		NUM_OF_KEYWORDS
 	};
 

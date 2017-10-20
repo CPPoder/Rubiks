@@ -50,7 +50,8 @@ const std::map<KeywordToken::Keyword, std::string> Help::mapFromKeywordToName =
 	std::make_pair(KeywordToken::Keyword::quicksolve,		"quicksolve"),
 	std::make_pair(KeywordToken::Keyword::solve,			"solve     "),
 	std::make_pair(KeywordToken::Keyword::turn,				"turn      "),
-	std::make_pair(KeywordToken::Keyword::Turns,			"Turns     ")
+	std::make_pair(KeywordToken::Keyword::Turns,			"Turns     "),
+	std::make_pair(KeywordToken::Keyword::show,				"show      ")
 };
 
 
@@ -68,7 +69,8 @@ const std::map<KeywordToken::Keyword, std::string> Help::mapFromKeywordToShortDe
 	std::make_pair(KeywordToken::Keyword::quicksolve,		"Solves a Cube quickly, but with many turns"),
 	std::make_pair(KeywordToken::Keyword::solve,			"Solves a Cube with least turns"),
 	std::make_pair(KeywordToken::Keyword::turn,				"Turns a Cube object"),
-	std::make_pair(KeywordToken::Keyword::Turns,			"Creates a new Turns object")
+	std::make_pair(KeywordToken::Keyword::Turns,			"Creates a new Turns object"),
+	std::make_pair(KeywordToken::Keyword::show,				"Shows a Cube in 3D")
 };
 
 
@@ -113,6 +115,17 @@ std::string createDetailedDescriptionForEcho()
 	stream << "echo <name>" << std::endl;
 	stream << "Outputs the Cube or Turns object named <name> to the terminal." << std::endl;
 	stream << "<name> must be an existing Cube or Turns object." << std::endl;
+
+	return stream.str();
+}
+
+std::string createDetailedDescriptionForShow()
+{
+	std::stringstream stream;
+
+	stream << "show <cube>" << std::endl;
+	stream << "Shows the Cube object named <cube> in 3D in a window by using OpenGL." << std::endl;
+	stream << "<cube> must be an existing Cube object." << std::endl;
 
 	return stream.str();
 }
@@ -213,6 +226,7 @@ const std::map<KeywordToken::Keyword, std::string> Help::mapFromKeywordToDetaile
 	std::make_pair(KeywordToken::Keyword::quicksolve,		createDetailedDescriptionForQuicksolve()),
 	std::make_pair(KeywordToken::Keyword::solve,			createDetailedDescriptionForSolve()),
 	std::make_pair(KeywordToken::Keyword::turn,				createDetailedDescriptionForTurn()),
-	std::make_pair(KeywordToken::Keyword::Turns,			createDetailedDescriptionForTurns())
+	std::make_pair(KeywordToken::Keyword::Turns,			createDetailedDescriptionForTurns()),
+	std::make_pair(KeywordToken::Keyword::show,				createDetailedDescriptionForShow())
 };
 

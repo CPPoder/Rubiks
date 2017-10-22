@@ -1,8 +1,11 @@
 #version 330 core
 
 in float fragmentColor;
+in vec2 fragmentTextureCoord;
 
 out vec4 fragColor;
+
+uniform sampler2D emissionMap;
 
 
 bool floatEqual(float f1, float f2)
@@ -54,5 +57,7 @@ vec3 mapFloatToColor(float f)
 
 void main()
 {
-    fragColor = vec4(mapFloatToColor(fragmentColor), 1.0);
+    vec3 stickerColor = mapFloatToColor(fragmentColor);
+    vec3 emissionColor = vec3(texture(emissionMap, fragmentTextureCoord));
+    fragColor = vec4(stickerColor * emissionColor, 1.0);
 }

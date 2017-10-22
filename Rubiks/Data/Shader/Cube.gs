@@ -11,6 +11,7 @@ in vec3 geometryNormal[];
 in float geometryColor[];
 
 out float fragmentColor;
+out vec2 fragmentTextureCoord;
 
 
 struct TrianglesVerticesDeviation
@@ -103,16 +104,20 @@ void main() {
 
 	TrianglesVerticesDeviation deviation = getTrianglesVerticesDeviationFromNormal(geometryNormal[0]);
 
-    gl_Position = fullMatrix * (gl_in[0].gl_Position + vec4(-deviation.Right + deviation.Up, 0.0) + 0.5f * vec4(geometryNormal[0], 0.0)); 
+    gl_Position = fullMatrix * (gl_in[0].gl_Position + vec4(-deviation.Right + deviation.Up, 0.0) + 0.5f * vec4(geometryNormal[0], 0.0));
+	fragmentTextureCoord = vec2(0.0f, 0.0f);
     EmitVertex();
 
     gl_Position = fullMatrix * (gl_in[0].gl_Position + vec4(+deviation.Right + deviation.Up, 0.0) + 0.5f * vec4(geometryNormal[0], 0.0));
+	fragmentTextureCoord = vec2(1.0f, 0.0f);
     EmitVertex();
 
-	gl_Position = fullMatrix * (gl_in[0].gl_Position + vec4(-deviation.Right - deviation.Up, 0.0) + 0.5f * vec4(geometryNormal[0], 0.0)); 
+	gl_Position = fullMatrix * (gl_in[0].gl_Position + vec4(-deviation.Right - deviation.Up, 0.0) + 0.5f * vec4(geometryNormal[0], 0.0));
+	fragmentTextureCoord = vec2(0.0f, 1.0f);
     EmitVertex();
 
     gl_Position = fullMatrix * (gl_in[0].gl_Position + vec4(+deviation.Right - deviation.Up, 0.0) + 0.5f * vec4(geometryNormal[0], 0.0));
+	fragmentTextureCoord = vec2(1.0f, 1.0f);
     EmitVertex();
     
     EndPrimitive();

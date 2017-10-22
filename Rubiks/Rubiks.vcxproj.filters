@@ -105,6 +105,12 @@
     <ClCompile Include="CubeModel.cpp">
       <Filter>Quelldateien\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parser.hpp">
@@ -177,6 +183,9 @@
       <Filter>Headerdateien\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="CubeModel.hpp">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.hpp">
       <Filter>Headerdateien\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

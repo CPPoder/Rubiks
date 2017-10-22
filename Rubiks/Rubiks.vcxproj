@@ -166,6 +166,8 @@
     <ClCompile Include="Rubiks.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Solver.cpp" />
+    <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Token.cpp" />
     <ClCompile Include="Turn.cpp" />
     <ClCompile Include="TurnOrder.cpp" />
@@ -192,6 +194,7 @@
     <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="Solver.hpp" />
+    <ClInclude Include="Texture.hpp" />
     <ClInclude Include="Token.hpp" />
     <ClInclude Include="Turn.hpp" />
     <ClInclude Include="TurnOrder.hpp" />

@@ -9,6 +9,7 @@
 #include "Shader.hpp"
 #include "CubeModel.hpp"
 #include "Clock.hpp"
+#include "Texture.hpp"
 
 #include "GLIncludes.hpp"
 

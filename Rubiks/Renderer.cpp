@@ -30,6 +30,10 @@ void Renderer::showCube(Cube const & cube)
 	//Create Model
 	CubeModel cubeModel(cube);
 
+	//Create Texture
+	my::Texture stickerTexture;
+	stickerTexture.load("./Data/Textures/emissionMapQuadratic512.png", true, GL_RGBA);
+
 	//Create Clock
 	Clock clock;
 	clock.restart();
@@ -57,6 +61,7 @@ void Renderer::showCube(Cube const & cube)
 		simpleShader.setMatrix4f("modelMatrix", modelMatrix);
 		simpleShader.setMatrix4f("viewMatrix", viewMatrix);
 		simpleShader.setMatrix4f("projectionMatrix", projectionMatrix);
+		glBindTexture(GL_TEXTURE_2D, stickerTexture.getID());
 		cubeModel.draw(simpleShader);
 		
 		glBindVertexArray(0);
@@ -111,6 +116,14 @@ void Renderer::processKeyboardInput(GLFWwindow* window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		camera.ProcessKeyboard(UP, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+	{
+		camera.ProcessKeyboard(DOWN, deltaTime);
 	}
 }
 

@@ -195,7 +195,7 @@ Shader::~Shader()
 	//glDeleteProgram(ID); //Very dangerous, if you do stuff like Shader s1 = Shader("", "");, which I did! :-(
 }
 
-void Shader::use()
+void Shader::use() const
 {
 	glUseProgram(ID);
 }

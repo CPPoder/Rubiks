@@ -155,6 +155,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="CubeModel.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="GLADInitializer.cpp" />
     <ClCompile Include="GLFWInitializer.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="colorOutput.h" />
     <ClInclude Include="Command.hpp" />
     <ClInclude Include="Cube.hpp" />
+    <ClInclude Include="CubeModel.hpp" />
     <ClInclude Include="Framework.hpp" />
     <ClInclude Include="GLADInitializer.hpp" />
     <ClInclude Include="GLFWInitializer.hpp" />
@@ -197,8 +199,9 @@
     <ClInclude Include="TurnTypeOrder.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Shader\Simple.fs" />
-    <None Include="Data\Shader\Simple.vs" />
+    <None Include="Data\Shader\Cube.fs" />
+    <None Include="Data\Shader\Cube.gs" />
+    <None Include="Data\Shader\Cube.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

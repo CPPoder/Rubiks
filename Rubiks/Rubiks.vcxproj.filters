@@ -102,6 +102,9 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Quelldateien\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="CubeModel.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parser.hpp">
@@ -173,12 +176,18 @@
     <ClInclude Include="Shader.hpp">
       <Filter>Headerdateien\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="CubeModel.hpp">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Shader\Simple.fs">
+    <None Include="Data\Shader\Cube.fs">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Data\Shader\Simple.vs">
+    <None Include="Data\Shader\Cube.gs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Data\Shader\Cube.vs">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

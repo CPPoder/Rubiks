@@ -39,6 +39,8 @@ public:
 	void rotateCounterClockwise();
 	void rotateTwice();
 
+	std::array<Color, 8u> getArrayOfRowwiseColors() const;
+
 private:
 	static std::array<Color, 8> mapArrayFromAnyModeToCyclicMode(std::array<Color, 8> arrayInAnyMode, ArrayToPlaneMode wantedMode);
 

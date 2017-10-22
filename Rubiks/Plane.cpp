@@ -109,7 +109,19 @@ bool operator==(Plane const & plane1, Plane const & plane2)
 
 
 
-
+std::array<Color, 8u> Plane::getArrayOfRowwiseColors() const
+{
+	std::array<Color, 8u> temp;
+	temp.at(0) = this->at(0);
+	temp.at(1) = this->at(1);
+	temp.at(2) = this->at(2);
+	temp.at(3) = this->at(7);
+	temp.at(4) = this->at(3);
+	temp.at(5) = this->at(6);
+	temp.at(6) = this->at(5);
+	temp.at(7) = this->at(4);
+	return std::move(temp);
+}
 
 
 

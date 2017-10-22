@@ -7,6 +7,8 @@
 
 #include "Camera.hpp"
 #include "Shader.hpp"
+#include "CubeModel.hpp"
+#include "Clock.hpp"
 
 #include "GLIncludes.hpp"
 

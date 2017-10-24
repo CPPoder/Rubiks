@@ -20,6 +20,7 @@ public:
 	void restart();
 	long long getElapsedTimeAsMilliseconds() const;
 	long long getElapsedTimeAsMicroseconds() const;
+	std::chrono::duration<double, std::micro> getElapsedTimeAsDuration() const;
 
 
 private:

@@ -2,10 +2,12 @@
 #define RENDERER_HPP
 
 #include <string>
+#include <thread>
 
 #include "Cube.hpp"
 
 #include "Camera.hpp"
+#include "OriginCamera.hpp"
 #include "Shader.hpp"
 #include "CubeModel.hpp"
 #include "Clock.hpp"
@@ -16,6 +18,8 @@
 class GLFWInitializer;
 class GLADInitializer;
 
+using USED_CAMERA = OriginCamera;
+using USED_CAMERA_MOVEMENT = OriginCameraMovement;
 
 class Renderer
 {
@@ -24,7 +28,8 @@ private:
 	static unsigned int width;
 	static unsigned int height;
 	static std::string title;
-	static Camera camera;
+	static USED_CAMERA camera;
+	static constexpr unsigned int wantedFPS = 60u;
 
 
 public:

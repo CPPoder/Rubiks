@@ -1,8 +1,8 @@
-#include "Camera.hpp"
+#include "OriginCamera.hpp"
 
 
 // Constructor with vectors
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
+OriginCamera::OriginCamera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 	: Front(glm::vec3(0.0f, 0.0f, -1.0f))
 {
 	Position = position;
@@ -13,7 +13,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 }
 
 // Constructor with scalar values
-Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch)
+OriginCamera::OriginCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch)
 	: Front(glm::vec3(0.0f, 0.0f, -1.0f))
 {
 	Position = glm::vec3(posX, posY, posZ);
@@ -24,37 +24,49 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 }
 
 // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
-glm::mat4 Camera::GetViewMatrix()
+glm::mat4 OriginCamera::GetViewMatrix()
 {
 	return glm::lookAt(Position, Position + Front, Up);
 }
 
 // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-void Camera::ProcessKeyboard(CameraMovement direction, float deltaTime)
+void OriginCamera::ProcessKeyboard(OriginCameraMovement direction, float deltaTime)
 {
 	float velocity = MovementSpeed * deltaTime;
-	if (direction == CameraMovement::FORWARD)
-		Position += Front * velocity;
-	if (direction == CameraMovement::BACKWARD)
-		Position -= Front * velocity;
-	if (direction == CameraMovement::LEFT)
+	if (direction == OriginCameraMovement::LEFT)
 		Position -= Right * velocity;
-	if (direction == CameraMovement::RIGHT)
+	if (direction == OriginCameraMovement::RIGHT)
 		Position += Right * velocity;
-	if (direction == CameraMovement::UP)
+	if (direction == OriginCameraMovement::UP)
 		Position += 2.f * WorldUp * velocity;
-	if (direction == CameraMovement::DOWN)
+	if (direction == OriginCameraMovement::DOWN)
 		Position -= 2.f * WorldUp * velocity;
 }
 
 // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
+void OriginCamera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
 {
 	xoffset *= MouseSensitivity;
 	yoffset *= MouseSensitivity;
 
-	Yaw += xoffset;
-	Pitch += yoffset;
+	//Get angle and radius from origin to camera
+	float xAngle = atan2(Position.z, Position.x);
+	float radiusCylindric = sqrt(Position.z * Position.z + Position.x * Position.x);
+
+	float newXAngle = xAngle + xoffset;
+
+	//Determine new Position due to newXAngle
+	float newX = radiusCylindric * cos(newXAngle);
+	float newZ = radiusCylindric * sin(newXAngle);
+	Position = glm::vec3(newX, Position.y, newZ);
+	Yaw = newXAngle * 180.f / 3.141592653f - 180.f;
+
+	//Determine new Position due to newYAngle
+	float radius = sqrt(Position.z * Position.z + Position.y * Position.y + Position.x * Position.x);
+	float yAngle = asin(Position.y / radius);
+	float newYAngle = yAngle - yoffset;
+	Position = glm::vec3(radius * cos(newXAngle) * cos(newYAngle), radius * sin(newYAngle), radius * sin(newXAngle) * cos(newYAngle));
+	Pitch = -newYAngle * 180.f / 3.141592653f;
 
 	// Make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (constrainPitch)
@@ -70,7 +82,7 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
 }
 
 // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-void Camera::ProcessMouseScroll(float yoffset)
+void OriginCamera::ProcessMouseScroll(float yoffset)
 {
 	if (Zoom >= 1.0f && Zoom <= 45.0f)
 		Zoom -= yoffset;
@@ -81,7 +93,7 @@ void Camera::ProcessMouseScroll(float yoffset)
 }
 
 // Calculates the front vector from the Camera's (updated) Eular Angles
-void Camera::updateCameraVectors()
+void OriginCamera::updateCameraVectors()
 {
 	// Calculate the new Front vector
 	glm::vec3 front;

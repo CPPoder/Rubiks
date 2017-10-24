@@ -160,6 +160,7 @@
     <ClCompile Include="GLADInitializer.cpp" />
     <ClCompile Include="GLFWInitializer.cpp" />
     <ClCompile Include="Help.cpp" />
+    <ClCompile Include="OriginCamera.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="GLIncludes.hpp" />
     <ClInclude Include="Help.hpp" />
     <ClInclude Include="MutexProtectedClass.hpp" />
+    <ClInclude Include="OriginCamera.hpp" />
     <ClInclude Include="Parser.hpp" />
     <ClInclude Include="Plane.hpp" />
     <ClInclude Include="PlanePos.hpp" />

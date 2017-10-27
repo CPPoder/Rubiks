@@ -7,6 +7,7 @@
 #include "TurnTypeOrder.hpp"
 #include "Solver.hpp"
 #include "Renderer.hpp"
+#include "Timer.hpp"
 
 
 #include <iostream>

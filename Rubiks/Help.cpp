@@ -51,7 +51,8 @@ const std::map<KeywordToken::Keyword, std::string> Help::mapFromKeywordToName =
 	std::make_pair(KeywordToken::Keyword::solve,			"solve     "),
 	std::make_pair(KeywordToken::Keyword::turn,				"turn      "),
 	std::make_pair(KeywordToken::Keyword::Turns,			"Turns     "),
-	std::make_pair(KeywordToken::Keyword::show,				"show      ")
+	std::make_pair(KeywordToken::Keyword::show,				"show      "),
+	std::make_pair(KeywordToken::Keyword::timer,			"timer     ")
 };
 
 
@@ -70,7 +71,8 @@ const std::map<KeywordToken::Keyword, std::string> Help::mapFromKeywordToShortDe
 	std::make_pair(KeywordToken::Keyword::solve,			"Solves a Cube with least turns"),
 	std::make_pair(KeywordToken::Keyword::turn,				"Turns a Cube object"),
 	std::make_pair(KeywordToken::Keyword::Turns,			"Creates a new Turns object"),
-	std::make_pair(KeywordToken::Keyword::show,				"Shows a Cube in 3D")
+	std::make_pair(KeywordToken::Keyword::show,				"Shows a Cube in 3D"),
+	std::make_pair(KeywordToken::Keyword::timer,			"Starts timer subprogram")
 };
 
 
@@ -207,7 +209,17 @@ std::string createDetailedDescriptionForTurns()
 	std::stringstream stream;
 
 	stream << "Turns <name>" << std::endl;
-	stream << "Creates a indenty turns object. Using <name>, one can later refer to it." << std::endl;
+	stream << "Creates a identity turns object. Using <name>, one can later refer to it." << std::endl;
+
+	return stream.str();
+}
+
+std::string createDetailedDescriptionForTimer()
+{
+	std::stringstream stream;
+
+	stream << "timer" << std::endl;
+	stream << "Starts the timer subprogram, which creates scrambles, measures times and saves records." << std::endl;
 
 	return stream.str();
 }
@@ -227,6 +239,7 @@ const std::map<KeywordToken::Keyword, std::string> Help::mapFromKeywordToDetaile
 	std::make_pair(KeywordToken::Keyword::solve,			createDetailedDescriptionForSolve()),
 	std::make_pair(KeywordToken::Keyword::turn,				createDetailedDescriptionForTurn()),
 	std::make_pair(KeywordToken::Keyword::Turns,			createDetailedDescriptionForTurns()),
-	std::make_pair(KeywordToken::Keyword::show,				createDetailedDescriptionForShow())
+	std::make_pair(KeywordToken::Keyword::show,				createDetailedDescriptionForShow()),
+	std::make_pair(KeywordToken::Keyword::timer,			createDetailedDescriptionForTimer())
 };
 

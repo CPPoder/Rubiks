@@ -761,7 +761,11 @@ unsigned int Turn::getNumberOfTurnTypes(bool useOnlyQuarterTurns)
 	return (useOnlyQuarterTurns ? Turn::arrayOfQuarterTurnTypes.size() : Turn::arrayOfAllTurnTypes.size());
 }
 
-
+TurnType Turn::getRandomTurnType()
+{
+	int posInArray = Random::getRandomIntBetween(0, Turn::arrayOfAllTurnTypes.size() - 1);
+	return Turn::getTurnTypeFromNumberInArray(posInArray, false);
+}
 
 
 

@@ -146,6 +146,9 @@ Command Parser::interprete(std::list<Token*> const & tokens)
 		case KeywordToken::Keyword::show:
 			return Parser::handleShowTokenCase(tokens);
 			break;
+		case KeywordToken::Keyword::timer:
+			return Parser::returnCommandIfSizeOfListIsOne(Command::TIMER, tokens);
+			break;
 		}
 	}
 
@@ -230,6 +233,11 @@ bool Parser::isBlockKeyword(std::string const & block, KeywordToken& keywordToke
 	if (block == "show")
 	{
 		keywordTokenReturn = Token::ShowToken;
+		return true;
+	}
+	if (block == "timer")
+	{
+		keywordTokenReturn = Token::TimerToken;
 		return true;
 	}
 

@@ -4,6 +4,7 @@
 
 #include "TurnType.hpp"
 #include "TurnTypeOrder.hpp"
+#include "Random.hpp"
 
 #include <list>
 #include <vector>
@@ -61,6 +62,7 @@ public:
 	static std::string getTurnTypeString(TurnType turnType);
 	static TurnType getTurnTypeFromNumberInArray(unsigned int number, bool useOnlyQuarterTurns);
 	static unsigned int getNumberOfTurnTypes(bool useOnlyQuarterTurns);
+	static TurnType getRandomTurnType();
 
 public:
 	static TurnType transformTurnTypeViaZ2Rotation(TurnType turnType); //This function is used to transform turns like T-perm onto the flipped cube

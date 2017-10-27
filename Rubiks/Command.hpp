@@ -23,7 +23,8 @@ public:
 		Input,
 		Quicksolve,
 		Help,
-		Show
+		Show,
+		Timer
 	};
 
 	struct InvalidSpecification
@@ -170,6 +171,7 @@ public:
 	void setQuicksolve(QuicksolveSpecification const & quicksolveSpecification);
 	void setHelp(HelpSpecification const & helpSpecification);
 	void setShow(ShowSpecification const & showSpecification);
+	void setTimer();
 
 private:
 	void clearSpecifications();
@@ -180,15 +182,10 @@ public:
 	static const Command DO_NOTHING;
 	static const Command INVALID;
 	static const Command CLEAR;
+	static const Command TIMER;
 
 
 };
-
-
-
-
-
-
 
 
 

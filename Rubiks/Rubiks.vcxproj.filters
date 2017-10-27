@@ -34,6 +34,12 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{2fec3ec9-93a6-4728-aa8a-294724edd9fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\Helpers">
+      <UniqueIdentifier>{1f9008e8-79c1-4811-875a-24f1e4fa5b08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Helpers">
+      <UniqueIdentifier>{000a9389-1bf1-4b0b-b414-35a0bbab5a64}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -41,9 +47,6 @@
   <ItemGroup>
     <ClCompile Include="Parser.cpp">
       <Filter>Quelldateien\Parser</Filter>
-    </ClCompile>
-    <ClCompile Include="Clock.cpp">
-      <Filter>Quelldateien\Core</Filter>
     </ClCompile>
     <ClCompile Include="Color.cpp">
       <Filter>Quelldateien\Core</Filter>
@@ -114,13 +117,25 @@
     <ClCompile Include="OriginCamera.cpp">
       <Filter>Quelldateien\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Scrambler.cpp">
+      <Filter>Quelldateien\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Clock.cpp">
+      <Filter>Quelldateien\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>Quelldateien\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Quelldateien\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyWatcher.cpp">
+      <Filter>Quelldateien\Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parser.hpp">
       <Filter>Headerdateien\Parser</Filter>
-    </ClInclude>
-    <ClInclude Include="Clock.hpp">
-      <Filter>Headerdateien\Core</Filter>
     </ClInclude>
     <ClInclude Include="Color.hpp">
       <Filter>Headerdateien\Core</Filter>
@@ -161,9 +176,6 @@
     <ClInclude Include="Solver.hpp">
       <Filter>Headerdateien\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MutexProtectedClass.hpp">
-      <Filter>Headerdateien\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Help.hpp">
       <Filter>Headerdateien\Parser</Filter>
     </ClInclude>
@@ -193,6 +205,24 @@
     </ClInclude>
     <ClInclude Include="OriginCamera.hpp">
       <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Scrambler.hpp">
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Clock.hpp">
+      <Filter>Headerdateien\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="MutexProtectedClass.hpp">
+      <Filter>Headerdateien\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.hpp">
+      <Filter>Headerdateien\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.hpp">
+      <Filter>Headerdateien\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyWatcher.hpp">
+      <Filter>Headerdateien\Helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

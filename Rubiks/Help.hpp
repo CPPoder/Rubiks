@@ -35,9 +35,5 @@ private:
 
 
 
-
-
-
-
 #endif //HELP_HPP
 

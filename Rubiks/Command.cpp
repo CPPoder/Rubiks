@@ -246,6 +246,12 @@ void Command::setShow(ShowSpecification const & showSpecification)
 	this->showSpecification = showSpecification;
 }
 
+void Command::setTimer()
+{
+	mType = Type::Timer;
+	this->clearSpecifications();
+}
+
 
 
 
@@ -311,6 +317,9 @@ void Command::assignRightCommandToLeftCommand(Command & l, Command const & r)
 	case Type::Show:
 		l.setShow(r.getShowSpecification());
 		break;
+	case Type::Timer:
+		l.setTimer();
+		break;
 	}
 }
 
@@ -341,6 +350,12 @@ const Command Command::INVALID = []() -> Command {
 const Command Command::CLEAR = []() -> Command {
 	Command cmd;
 	cmd.setClear();
+	return cmd;
+}();
+
+const Command Command::TIMER = []() -> Command {
+	Command cmd;
+	cmd.setTimer();
 	return cmd;
 }();
 

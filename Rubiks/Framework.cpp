@@ -80,6 +80,9 @@ void Framework::run()
 				std::cout << "There is no Cube object named " << cmd.getShowSpecification().name << "!" << std::endl;
 			}
 			break;
+		case Command::Type::Timer:
+			Timer::startSubprogram();
+			break;
 		}
 	}
 }

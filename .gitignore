@@ -268,3 +268,5 @@ Rubiks/Data/Textures/20171022_215635.jpg
 Rubiks/Data/Textures/emissionMapQuadratic.png
 Rubiks/Data/Textures/emissionMap.png
 Rubiks/Data/Textures/OneSticker.png
+*.usr
+*.rec

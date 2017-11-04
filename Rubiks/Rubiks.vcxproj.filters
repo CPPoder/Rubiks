@@ -40,6 +40,12 @@
     <Filter Include="Quelldateien\Helpers">
       <UniqueIdentifier>{000a9389-1bf1-4b0b-b414-35a0bbab5a64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\Timer">
+      <UniqueIdentifier>{e0c20cbf-92b5-481c-9f91-c3e2e0022809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Timer">
+      <UniqueIdentifier>{c5e42a22-21a2-4597-83bb-7ae189c71b80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -126,10 +132,28 @@
     <ClCompile Include="Random.cpp">
       <Filter>Quelldateien\Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Quelldateien\Core</Filter>
-    </ClCompile>
     <ClCompile Include="KeyWatcher.cpp">
+      <Filter>Quelldateien\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Date.cpp">
+      <Filter>Quelldateien\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInput.cpp">
+      <Filter>Quelldateien\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Record.cpp">
+      <Filter>Quelldateien\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="TimePair.cpp">
+      <Filter>Quelldateien\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Quelldateien\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="User.cpp">
+      <Filter>Quelldateien\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="StringManipulation.cpp">
       <Filter>Quelldateien\Helpers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -218,10 +242,28 @@
     <ClInclude Include="Random.hpp">
       <Filter>Headerdateien\Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="Timer.hpp">
-      <Filter>Headerdateien\Core</Filter>
-    </ClInclude>
     <ClInclude Include="KeyWatcher.hpp">
+      <Filter>Headerdateien\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Date.hpp">
+      <Filter>Headerdateien\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInput.hpp">
+      <Filter>Headerdateien\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Record.hpp">
+      <Filter>Headerdateien\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="TimePair.hpp">
+      <Filter>Headerdateien\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.hpp">
+      <Filter>Headerdateien\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="User.hpp">
+      <Filter>Headerdateien\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="StringManipulation.hpp">
       <Filter>Headerdateien\Helpers</Filter>
     </ClInclude>
   </ItemGroup>

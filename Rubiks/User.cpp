@@ -1,5 +1,7 @@
 #include "User.hpp"
 
+#include <cstdio>
+
 
 User::User(std::string const & _name, std::string const & _dataPath)
 	: name(_name), dataPath(_dataPath)
@@ -39,6 +41,72 @@ std::list<Record>::const_iterator User::getEndOfRecords() const
 std::list<Record> const & User::getListOfRecords() const
 {
 	return listOfRecords;
+}
+
+
+TimePair User::getAverageOverLast(unsigned int number) const
+{
+	//Handle special cases
+	if (number == 0u)
+	{
+		return TimePair(0, 0);
+	}
+	if (listOfRecords.empty())
+	{
+		return TimePair(0, 0);
+	}
+
+	//Calculate average
+	float sum = 0.f;
+	unsigned int counter = 0u;
+	for (std::list<Record>::const_reverse_iterator it = listOfRecords.crbegin(); (it != listOfRecords.crend() && counter < number); ++it, ++counter)
+	{
+		sum += it->getTime().getTimeAsFloatInSeconds();
+	}
+	float average = sum / counter;
+	return TimePair::trafoSecondsIntoTimePair(average);
+}
+
+
+TimePair User::getAverage() const
+{
+	//Handle special cases
+	if (listOfRecords.empty())
+	{
+		return TimePair(0, 0);
+	}
+
+	//Calculate average
+	float sum = 0.f;
+	for (auto const & rec : listOfRecords)
+	{
+		sum += rec.getTime().getTimeAsFloatInSeconds();
+	}
+	float average = sum / listOfRecords.size();
+	return TimePair::trafoSecondsIntoTimePair(average);
+}
+
+
+Record User::getBestRecord() const
+{
+	Record best(Date::getCurrentDate(), TimePair(0, 0), {});
+	bool bestIsInitiatilzed = false;
+	for (auto const & rec : listOfRecords)
+	{
+		if (bestIsInitiatilzed)
+		{
+			if (rec.getTime() < best.getTime())
+			{
+				best = rec;
+			}
+		}
+		else
+		{
+			bestIsInitiatilzed = true;
+			best = rec;
+		}
+	}
+	return std::move(best);
 }
 
 
@@ -178,12 +246,13 @@ bool User::registerUser(std::string const & name)
 
 bool User::eraseUser(std::string const & name)
 {
-	if (User::checkIfNameIsUnique(name))
+	if (User::checkIfNameIsUnique(name)) //Check if there exist such a user name
 	{
 		return false;
 	}
-	else
+	else //If it exist, erase it
 	{
+		//Erase user
 		std::vector<User> vecOfUsers = User::loadUsers();
 		unsigned int posOfUserToErase;
 		for (unsigned int i = 0; i < vecOfUsers.size(); ++i)
@@ -195,15 +264,21 @@ bool User::eraseUser(std::string const & name)
 			}
 		}
 		std::vector<User> newVecOfUsers;
+		std::string usersDataPath;
 		for (unsigned int i = 0; i < vecOfUsers.size(); ++i)
 		{
 			if (i == posOfUserToErase)
 			{
+				usersDataPath = vecOfUsers.at(i).getDataPath();
 				continue;
 			}
 			newVecOfUsers.push_back(vecOfUsers.at(i));
 		}
 		User::saveUsers(newVecOfUsers);
+
+		//Delete the corresponding .usr file
+		std::remove(usersDataPath.c_str());
+
 		return true;
 	}
 }

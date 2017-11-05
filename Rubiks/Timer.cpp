@@ -48,12 +48,13 @@ void Timer::getUserInput()
 {
 	//Show existing users
 	std::cout << "Welcome in the Timer subprogram! Existing users are: " << std::endl;
-	std::cout << "#\tName" << std::endl;
-	std::cout << "----------------------" << std::endl;
+	std::cout << std::endl;
+	std::cout << "#\tName\tSolves\tBest\tAverage" << std::endl;
+	std::cout << "---------------------------------------" << std::endl;
 	std::vector<User> vecOfUsers = User::loadUsers();
 	for (unsigned int i = 0; i < vecOfUsers.size(); ++i)
 	{
-		std::cout << i << '\t' << vecOfUsers.at(i).getName() << std::endl;
+		std::cout << i << '\t' << vecOfUsers.at(i).getName() << '\t' << vecOfUsers.at(i).getListOfRecords().size() << '\t' << vecOfUsers.at(i).getBestRecord().getTime() << '\t' << vecOfUsers.at(i).getAverage() << std::endl;
 	}
 	if (vecOfUsers.empty())
 	{
@@ -72,7 +73,9 @@ void Timer::getUserInput()
 		std::cout << "1" << '\t' << "Choose an user" << std::endl;
 		std::cout << "2" << '\t' << "Create an user" << std::endl;
 		std::cout << "3" << '\t' << "Delete an user" << std::endl;
-		std::string optionString = UI::demand("Choose an option: ", { "1", "2", "3" });
+		std::cout << "4" << '\t' << "Exit timer subprogram" << std::endl;
+		std::cout << std::endl;
+		std::string optionString = UI::demand("Choose an option: ", { "1", "2", "3", "4" });
 		int option = std::stoi(optionString);
 		switch (option)
 		{
@@ -87,17 +90,30 @@ void Timer::getUserInput()
 			Timer::deleteUserViaUI();
 			Timer::getUserInput();
 			break;
+		case 4:
+			throw QuitException();
 		}
 	}
 }
 
 void Timer::showData()
 {
-	auto list = pActualUser->getListOfRecords();
-	for (auto const & rec : list)
-	{
-		std::cout << Record::makeDateStringFromRecord(rec) << '\t' << Record::makeTimeStringFromRecord(rec) << '\t' << Record::makeScrambleStringFromRecord(rec) << std::endl;
-	}
+	std::string const statisticsLine = "----------------------";
+	std::cout << "Statistics:" << std::endl;
+	std::cout << statisticsLine << std::endl;
+	std::cout << "Last solve: " << pActualUser->getAverageOverLast(1u) << std::endl;
+	std::cout << "Best solve: " << pActualUser->getBestRecord().getTime() << std::endl;
+	std::cout << "Average over last 5: " << pActualUser->getAverageOverLast(5u) << std::endl;
+	std::cout << "Average over last 10: " << pActualUser->getAverageOverLast(10u) << std::endl;
+	std::cout << "Average over last 20: " << pActualUser->getAverageOverLast(20u) << std::endl;
+	std::cout << "Average over last 50: " << pActualUser->getAverageOverLast(50u) << std::endl;
+	std::cout << "Average over last 200: " << pActualUser->getAverageOverLast(200u) << std::endl;
+	std::cout << "Average over last 500: " << pActualUser->getAverageOverLast(500u) << std::endl;
+	std::cout << "Average over last 2000: " << pActualUser->getAverageOverLast(2000u) << std::endl;
+	std::cout << "Total average: " << pActualUser->getAverage() << std::endl;
+	std::cout << "Number of solves: " << pActualUser->getListOfRecords().size() << std::endl;
+	std::cout << statisticsLine << std::endl;
+	std::cout << std::endl;
 }
 
 TimePair Timer::doActualTimerStuff()
@@ -139,15 +155,17 @@ TimePair Timer::doActualTimerStuff()
 	//Get time
 	TimePair timePair = TimePair::trafoMicrosecsIntoTimePair(timerClock.getElapsedTimeAsMicroseconds());
 	std::cout << '\r' << "Solve time: " << timePair << std::endl;
+	std::cout << std::endl;
 	Timer::pActualUser->addRecord(Record(Date::getCurrentDate(), timePair, scramble));
 	return timePair;
 }
 
 void Timer::waitForContinuation()
 {
-	std::cout << "Press Space to continue, ESC to quit..." << std::endl;
+	std::cout << "Press Space to continue, ESC to quit, D to erase last solve..." << std::endl;
 	KeyWatcher keyWatcherForESC(sf::Keyboard::Key::Escape);
 	KeyWatcher keyWatcherForSpace(sf::Keyboard::Key::Space);
+	KeyWatcher keyWatcherForD(sf::Keyboard::Key::D);
 	while (true)
 	{
 		if (keyWatcherForESC.checkForKeyRelease())
@@ -157,6 +175,27 @@ void Timer::waitForContinuation()
 		if (keyWatcherForSpace.checkForKeyRelease())
 		{
 			return;
+		}
+		if (keyWatcherForD.checkForKeyRelease())
+		{
+			std::string sure = UI::demand("Are you sure you want to delete the last solve? (yes, n) ", { "yes", "n" });
+			if (sure == "yes")
+			{
+				if (pActualUser->getListOfRecords().empty())
+				{
+					std::cout << "There are no records to erase!" << std::endl;
+				}
+				else
+				{
+					pActualUser->eraseLastRecord();
+					std::cout << "Last record has been successfully erased!" << std::endl;
+				}
+			}
+			else
+			{
+				std::cout << "Deletion of last solve has been aborted!" << std::endl;
+			}
+			std::cout << "Press Space to continue, ESC to quit, D to erase last solve..." << std::endl;
 		}
 		std::this_thread::sleep_for(std::chrono::microseconds(1000));
 	}

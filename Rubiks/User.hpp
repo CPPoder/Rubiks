@@ -29,6 +29,9 @@ public:
 	std::list<Record>::const_iterator getBeginOfRecords() const;
 	std::list<Record>::const_iterator getEndOfRecords() const;
 	std::list<Record> const & getListOfRecords() const;
+	TimePair getAverageOverLast(unsigned int number) const;
+	TimePair getAverage() const;
+	Record getBestRecord() const;
 
 public:
 	void addRecord(Record const & record);

@@ -55,4 +55,3 @@ const std::function<bool(char)> UserInput::IS_LETTER_OR_NUMBER = [](char c)
 	return (upperCase || lowerCase || number);
 };
 
-

@@ -55,6 +55,12 @@ void Solver::solveManager(Cube const & cube, TurnTypeOrder& turns)
 		std::cout << "Aborted solving subprogram!" << std::endl << std::endl;
 		return;
 	}
+	catch (Solver::ExperimentalModesException)
+	{
+		SolveAttributes solveAttributes(SolveTurns::QUARTER_TURNS, Comparator::FullCube, InterruptProperties(InterruptProperties::Type::NEVER));
+		TurnTypeOrder turnTypeOrder = Solver::solveUsingRAM(cube, solveAttributes);
+		turns = turnTypeOrder;
+	}
 }
 
 
@@ -174,6 +180,105 @@ TurnTypeOrder Solver::solve(Cube const & cube, SolveAttributes solveAttributes, 
 
 		//Reset newCube
 		newCube = cube;
+	}
+}
+
+
+TurnTypeOrder Solver::solveUsingRAM(Cube const & cube, SolveAttributes solveAttributes, std::ostream & oStream)
+{
+	//Translate SolveTurns into bool
+	bool useOnlyQuarterTurns = (solveAttributes.solveTurns == SolveTurns::QUARTER_TURNS);
+
+	//Declare Clocks
+	Clock timeSinceSolveClock;
+	Clock newTurnNumberClock;
+
+	//Declare interrupt variable
+	bool needInterruption = false;
+
+	//Set up solved cube
+	Cube const solvedCube;
+
+	//Handle solved cube case
+	if (solveAttributes.comparator(cube, solvedCube))
+	{
+		oStream << "Cube is already solved!" << std::endl;
+		return TurnTypeOrder();
+	}
+
+	//Create Vector of TurnTypeOrder and Cube Pairs
+	using TurnedCubesType = std::list<std::pair<TurnTypeOrder, Cube>>;
+	TurnedCubesType vecOfTurnedCubes;
+	vecOfTurnedCubes.push_back(std::make_pair(TurnTypeOrder{}, cube));
+
+	//Create mode variable
+	bool fillMode = true;
+
+	//Fill vecOfTurnedCubes
+	while (fillMode)
+	{
+		std::cout << "Check all turns with " << vecOfTurnedCubes.front().first.size() + 1 << " turns..." << std::endl;
+		TurnedCubesType newVecOfTurnedCubes;
+		for (auto const & pair : vecOfTurnedCubes)
+		{
+			std::vector<TurnType> extendingTurnTypes = Solver::getExtendingTurnTypesFor(pair.first, useOnlyQuarterTurns);
+			for (auto const & extendingTurnType : extendingTurnTypes)
+			{
+				Cube newCube = pair.second;
+				newCube.turn(extendingTurnType);
+				if (solveAttributes.comparator(newCube, solvedCube))
+				{
+					//Do stuff in case that solution has been found
+					oStream << "Solved! Turns: " << pair.first + extendingTurnType << " (Time: " << timeSinceSolveClock.getElapsedTimeAsMilliseconds() << " ms)" << std::endl;
+					return pair.first + extendingTurnType;
+				}
+				else
+				{
+					//Put newCube into newVecOfTurnedCubes
+					newVecOfTurnedCubes.push_back(std::make_pair(pair.first + extendingTurnType, std::move(newCube)));
+				}
+			}
+		}
+		vecOfTurnedCubes = std::move(newVecOfTurnedCubes);
+		oStream << "Time for checking: " << newTurnNumberClock.getElapsedTimeAsMilliseconds() << " ms" << std::endl;
+		newTurnNumberClock.restart();
+		fillMode = (vecOfTurnedCubes.front().first.size() < 6u);
+	}
+
+	//Use vecOfTurnedCubes to solve faster
+	std::cout << "Left fill mode!" << std::endl;
+	std::vector<unsigned int> vecOfExtraTurnNumbers;
+	
+	while (true)
+	{
+		bool sizeOfVecOfExtraTurnNumbersHasChanged;
+		createNextVectorOfTurnNumbersForSolvingSmarter(vecOfExtraTurnNumbers, useOnlyQuarterTurns, sizeOfVecOfExtraTurnNumbersHasChanged);
+		if (sizeOfVecOfExtraTurnNumbersHasChanged)
+		{
+			if (vecOfExtraTurnNumbers.size() != 1u) //This excludes the output of time directly after mode change!
+			{
+				oStream << "Time for checking: " << newTurnNumberClock.getElapsedTimeAsMilliseconds() << " ms" << std::endl;
+			}
+			newTurnNumberClock.restart();
+			std::cout << "Check all turns with " << vecOfTurnedCubes.front().first.size() + vecOfExtraTurnNumbers.size() << " turns..." << std::endl;
+		}
+		TurnTypeOrder extraTurnTypeOrder;
+		for (auto const & num : vecOfExtraTurnNumbers)
+		{
+			TurnType turnType = Turn::getTurnTypeFromNumberInArray(num, useOnlyQuarterTurns);
+			extraTurnTypeOrder = extraTurnTypeOrder + turnType;
+		}
+
+		for (auto const & pair : vecOfTurnedCubes)
+		{
+			Cube turnedCube = pair.second;
+			turnedCube.turn(extraTurnTypeOrder);
+			if (solveAttributes.comparator(turnedCube, solvedCube))
+			{
+				oStream << "Solved! Turns: " << pair.first + extraTurnTypeOrder << " (Time: " << timeSinceSolveClock.getElapsedTimeAsMilliseconds() << " ms)" << std::endl;
+				return pair.first + extraTurnTypeOrder;
+			}
+		}
 	}
 }
 
@@ -1114,6 +1219,13 @@ Solver::SolveAttributes Solver::askForUserInput()
 {
 	//Enter solving subprogram
 	std::cout << "Enter solving subprogram (For abortion type \"quit\")" << std::endl;
+
+	//Entry for Experimental modes
+	std::string experimentalModeString = Solver::demandUserInput("Do you want to continue in experimental mode? (yes, n)", { "yes", "n" });
+	if (experimentalModeString == "yes")
+	{
+		throw ExperimentalModesException();
+	}
 
 	//Find out SolveTurns
 	std::string solveTurnsString = Solver::demandUserInput(
@@ -2262,6 +2374,25 @@ const Solver::Comparator Solver::Comparator::FullCubeComposed =
 	Solver::Comparator::FullCorner::DownBackRight
 	);
 
+
+
+
+
+std::vector<TurnType> Solver::getExtendingTurnTypesFor(TurnTypeOrder const & turnTypeOrder, bool useOnlyQuarterTurns)
+{
+	std::vector<TurnType> extendingTurnTypes;
+
+	for (unsigned int i = 0; i < Turn::getNumberOfTurnTypes(useOnlyQuarterTurns); ++i)
+	{
+		TurnType newTurnType = Turn::getTurnTypeFromNumberInArray(i, useOnlyQuarterTurns);
+		if (true || turnTypeOrder.empty())
+		{
+			extendingTurnTypes.push_back(newTurnType);
+		}
+	}
+
+	return std::move(extendingTurnTypes);
+}
 
 
 

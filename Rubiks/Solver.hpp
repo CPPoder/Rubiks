@@ -126,6 +126,7 @@ public:
 
 private:
 	struct QuitException{};
+	struct ExperimentalModesException{};
 	struct SolverState
 	{
 		std::vector<unsigned int> oldVectorOfTurnNumbers;
@@ -162,6 +163,7 @@ public:
 private:
 	static void solveSubManager(Cube const & cube, TurnTypeOrder& turns, SolveAttributes const & solveAttributes, InterruptContinuationInfo const & interruptContinuationInfo);
 	static TurnTypeOrder solve(Cube const & cube, SolveAttributes solveAttributes, std::vector<unsigned int> const & initialVectorOfTurnNumbers, std::ostream & oStream = std::cout);
+	static TurnTypeOrder solveUsingRAM(Cube const & cube, SolveAttributes solveAttributes, std::ostream & oStream = std::cout);
 	static TurnTypeOrder solveForMultithreading(Cube const & cube, SolveAttributes solveAttributes, std::vector<unsigned int> const & initialVectorOfTurnNumbers, MutexProtectedClass<bool>& solutionFound);
 	static TurnTypeOrder solveOneOfSeveralComparators(Cube const & cube, SolveAttributes solveAttributesWithComparatorBase, std::list<std::pair<Comparator, F2LPairTargetPos>> const & listOfExtraComparatorPairs, std::vector<unsigned int> const & initialVectorOfTurnNumbers,  F2LPairTargetPos& solvedPairPosReturn, std::ostream & oStream = std::cout);
 public:
@@ -192,6 +194,9 @@ private:
 	static void skipEqualNumbers(std::vector<unsigned int>& vecOfTurnNumbers, bool useOnlyQuarterTurns, bool& turnNumberVecSizeChanged, bool& vecChanged);
 	static void fillVectorWithZerosFrom(std::vector<unsigned int>& vec, unsigned int index);
 	static TurnTypeOrder trafoVecOfTurnNumInTurnTypeOrder(std::vector<unsigned int> const & vec, bool useOnlyQuarterTurns);
+
+private: //RAM solving static private functions
+	static std::vector<TurnType> getExtendingTurnTypesFor(TurnTypeOrder const & turnTypeOrder, bool useOnlyQuarterTurns);
 
 
 };

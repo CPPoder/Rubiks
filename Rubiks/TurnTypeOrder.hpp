@@ -15,6 +15,8 @@ using TurnTypeOrder = std::vector<TurnType>;
 
 std::ostream& operator<<(std::ostream& oStream, TurnTypeOrder const & turnTypeOrder);
 
+TurnTypeOrder operator!(TurnTypeOrder const & turnTypeOrder);
+
 struct EmptyTurnTypeOrder
 {
 	static const TurnTypeOrder Empty;

@@ -238,7 +238,7 @@ TurnTypeOrder Solver::solveUsingRAM(Cube const & cube, SolveAttributes solveAttr
 		vecOfTurnedCubes = std::move(newVecOfTurnedCubes);
 		oStream << "Time for checking: " << newTurnNumberClock.getElapsedTimeAsMilliseconds() << " ms" << std::endl;
 		newTurnNumberClock.restart();
-		fillMode = (vecOfTurnedCubes.front().first.size() < 6u);
+		fillMode = ( useOnlyQuarterTurns ? (vecOfTurnedCubes.front().first.size() < 6u) : (vecOfTurnedCubes.front().first.size() < 5u) ); //Fill 6 or 5 turns depending on useOnlyQuarterTurns
 	}
 
 	//Use vecOfTurnedCubes to solve faster
@@ -1283,14 +1283,15 @@ Solver::SolveAttributes Solver::askForUserInput()
 }
 
 
-Solver::InterruptProperties Solver::askForInterruptPropertiesUserInput()
+Solver::InterruptProperties Solver::askForInterruptPropertiesUserInput() //Tell the user that some things are not available in RAM mode!!!
 {
 	InterruptProperties interruptProp;
 	std::string interruptString = Solver::demandUserInput(
 		"Which interrupt behaviour do you want?\n"
 		"1: No interruption\n"
 		"2: Interrupt after some time\n"
-		"3: Interrupt after having checked all turns of some length\n",
+		"3: Interrupt after having checked all turns of some length\n"
+		"(Interrupts are not usable in RAM mode! There, the interrupt behavior is always no interruption!)\n",
 		{ "1", "2", "3" }
 	);
 	int interruptInt = std::stoi(interruptString);
@@ -2385,12 +2386,37 @@ const Solver::Comparator Solver::Comparator::FullCubeComposed =
 
 std::vector<TurnType> Solver::getExtendingTurnTypesFor(TurnTypeOrder const & turnTypeOrder, bool useOnlyQuarterTurns)
 {
+	//Declare collector for extending turn types
 	std::vector<TurnType> extendingTurnTypes;
 
+	//Try all turnTypes
 	for (unsigned int i = 0; i < Turn::getNumberOfTurnTypes(useOnlyQuarterTurns); ++i)
 	{
+		//Generate newTurnType
 		TurnType newTurnType = Turn::getTurnTypeFromNumberInArray(i, useOnlyQuarterTurns);
-		if (true || turnTypeOrder.empty())
+
+		//Handle empty turnTypeOrder case
+		if (turnTypeOrder.empty())
+		{
+			extendingTurnTypes.push_back(newTurnType);
+			continue;
+		}
+
+		//Exclude some TurnTypes:
+		//In quarter turns case:	Exclude, if new turn is inverse to last turn
+		//In all turns case:		Exclude, if new turn acts on same plane
+		bool exclude;
+		if (useOnlyQuarterTurns)
+		{
+			exclude = (newTurnType == !turnTypeOrder.back()); //back() is safe, because turnTypeOrder is surely not empty due to handle empty turnTypeOrder case
+		}
+		else
+		{
+			exclude = doTurnTypesActOnSamePlane(newTurnType, turnTypeOrder.back()); //back() is safe, because turnTypeOrder is surely not empty due to handle empty turnTypeOrder case
+		}
+
+		//Add to extendingTurnTypes if not excluded
+		if (!exclude)
 		{
 			extendingTurnTypes.push_back(newTurnType);
 		}

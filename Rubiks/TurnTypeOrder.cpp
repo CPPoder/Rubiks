@@ -15,6 +15,19 @@ std::ostream& operator<<(std::ostream& oStream, TurnTypeOrder const & turnTypeOr
 
 
 
+TurnTypeOrder operator!(TurnTypeOrder const & turnTypeOrder)
+{
+	TurnTypeOrder inverse;
+	for (TurnTypeOrder::const_reverse_iterator it = turnTypeOrder.crbegin(); it != turnTypeOrder.crend(); ++it)
+	{
+		inverse.push_back(!(*it));
+	}
+	return std::move(inverse);
+}
+
+
+
+
 TurnTypeOrder initializeStaticTurnTypeOrder(std::string const & string)
 {
 	TurnTypeOrder t;

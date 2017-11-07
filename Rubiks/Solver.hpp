@@ -114,19 +114,25 @@ public:
 		static const InterruptContinuationInfo NO_CONTINUATION;
 	};
 
+	enum class SolverMode
+	{
+		Classic,
+		RAM
+	};
+
 	struct SolveAttributes
 	{
 		SolveTurns solveTurns;
 		Comparator comparator;
 		InterruptProperties interruptProperties;
+		SolverMode solverMode;
 
 		SolveAttributes();
-		SolveAttributes(SolveTurns const & _solveTurns, Comparator const & _comparator, InterruptProperties const & _interruptProperties);
+		SolveAttributes(SolveTurns const & _solveTurns, Comparator const & _comparator, InterruptProperties const & _interruptProperties, SolverMode const & _solverMode = SolverMode::Classic);
 	};
 
 private:
 	struct QuitException{};
-	struct ExperimentalModesException{};
 	struct SolverState
 	{
 		std::vector<unsigned int> oldVectorOfTurnNumbers;

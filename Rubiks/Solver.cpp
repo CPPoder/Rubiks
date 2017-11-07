@@ -3,12 +3,12 @@
 
 
 Solver::SolveAttributes::SolveAttributes()
-	: SolveAttributes(SolveTurns::QUARTER_TURNS, Comparator::FullCube, InterruptProperties(InterruptProperties::Type::NEVER))
+	: SolveAttributes(SolveTurns::QUARTER_TURNS, Comparator::FullCube, InterruptProperties(InterruptProperties::Type::NEVER), SolverMode::Classic)
 {
 }
 
-Solver::SolveAttributes::SolveAttributes(SolveTurns const & _solveTurns, Comparator const & _comparator, InterruptProperties const & _interruptProperties)
-	: solveTurns(_solveTurns), comparator(_comparator), interruptProperties(_interruptProperties)
+Solver::SolveAttributes::SolveAttributes(SolveTurns const & _solveTurns, Comparator const & _comparator, InterruptProperties const & _interruptProperties, SolverMode const & _solverMode)
+	: solveTurns(_solveTurns), comparator(_comparator), interruptProperties(_interruptProperties), solverMode(_solverMode)
 {
 }
 
@@ -55,12 +55,6 @@ void Solver::solveManager(Cube const & cube, TurnTypeOrder& turns)
 		std::cout << "Aborted solving subprogram!" << std::endl << std::endl;
 		return;
 	}
-	catch (Solver::ExperimentalModesException)
-	{
-		SolveAttributes solveAttributes(SolveTurns::QUARTER_TURNS, Comparator::FullCube, InterruptProperties(InterruptProperties::Type::NEVER));
-		TurnTypeOrder turnTypeOrder = Solver::solveUsingRAM(cube, solveAttributes);
-		turns = turnTypeOrder;
-	}
 }
 
 
@@ -69,13 +63,15 @@ void Solver::solveSubManager(Cube const & cube, TurnTypeOrder& turns, SolveAttri
 	try
 	{
 		TurnTypeOrder turnTypeOrder;
-		if (interruptContinuationInfo.isContinuation)
+		std::vector<unsigned int> continuationVector = (interruptContinuationInfo.isContinuation ? interruptContinuationInfo.oldVecOfTurnNumbers : std::vector<unsigned int>{});
+		switch (solveAttributes.solverMode)
 		{
-			turnTypeOrder = Solver::solve(cube, solveAttributes, interruptContinuationInfo.oldVecOfTurnNumbers);
-		}
-		else
-		{
-			turnTypeOrder = Solver::solve(cube, solveAttributes, {});
+		case SolverMode::Classic:
+			turnTypeOrder = Solver::solve(cube, solveAttributes, continuationVector);
+			break;
+		case SolverMode::RAM:
+			turnTypeOrder = Solver::solveUsingRAM(cube, solveAttributes);
+			break;
 		}
 		turns = turnTypeOrder;
 	}
@@ -1220,11 +1216,20 @@ Solver::SolveAttributes Solver::askForUserInput()
 	//Enter solving subprogram
 	std::cout << "Enter solving subprogram (For abortion type \"quit\")" << std::endl;
 
-	//Entry for Experimental modes
-	std::string experimentalModeString = Solver::demandUserInput("Do you want to continue in experimental mode? (yes, n)", { "yes", "n" });
-	if (experimentalModeString == "yes")
+	//Ask for solver mode
+	std::string experimentalModeString = Solver::demandUserInput( 
+		"Which mode do you want to use?\n"
+		"1: Classic mode\n"
+		"2: RAM mode\n",
+		{ "1", "2" });
+	SolverMode solverMode;
+	if (experimentalModeString == "1")
 	{
-		throw ExperimentalModesException();
+		solverMode = SolverMode::Classic;
+	}
+	if (experimentalModeString == "2")
+	{
+		solverMode = SolverMode::RAM;
 	}
 
 	//Find out SolveTurns
@@ -1274,7 +1279,7 @@ Solver::SolveAttributes Solver::askForUserInput()
 	InterruptProperties interruptProp = Solver::askForInterruptPropertiesUserInput();
 
 	//Return SolveAttributes
-	return SolveAttributes(solveTurns, cmp, interruptProp);
+	return SolveAttributes(solveTurns, cmp, interruptProp, solverMode);
 }
 
 

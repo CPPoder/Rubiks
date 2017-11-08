@@ -1283,7 +1283,7 @@ Solver::SolveAttributes Solver::askForUserInput()
 }
 
 
-Solver::InterruptProperties Solver::askForInterruptPropertiesUserInput() //Tell the user that some things are not available in RAM mode!!!
+Solver::InterruptProperties Solver::askForInterruptPropertiesUserInput()
 {
 	InterruptProperties interruptProp;
 	std::string interruptString = Solver::demandUserInput(

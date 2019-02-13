@@ -12,7 +12,9 @@ turn cube RF'U
 (This turns the Cube cube by RF'U.)
 
 Turns t
+
 assign RB2R' t
+
 turn cube t
 
 (This creates a Turns object called t,

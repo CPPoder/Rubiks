@@ -11,6 +11,15 @@ turn cube RF'U
 
 (This turns the Cube cube by RF'U.)
 
+Turns t
+assign RB2R' t
+turn cube t
+
+(This creates a Turns object called t,
+assigns the turns RB2R' to t
+and turns the cube by the content of t)
+
+
 ## Solve cubes
 Turns turns
 

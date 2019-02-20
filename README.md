@@ -55,6 +55,8 @@ show cube
 
 (Opens a window in which one can view the cube in 3D, using OpenGL)
 
+![rubiks_show_example](https://user-images.githubusercontent.com/6805564/53095868-1a6aab00-351e-11e9-9e60-2c360215676e.png)
+
 
 ## Time and manage your solves
 ```
